@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res) => {
     try {
-        const { name, mobile, email, password, confirmPassword, state, address, language } = req.body;
+        const { name, mobile, email, password, confirmPassword, state, address, language , userId} = req.body;
 
         // Validate language
         if (!["English", "Hindi", "Gujarati"].includes(language)) {
@@ -20,9 +20,14 @@ exports.signup = async (req, res) => {
             return res.status(400).json({ message: "User already exists" });
         }
 
+        const existingUserId = await User.findOne({ userId });
+        if (existingUserId) {
+            return res.status(400).json({ message: "User ID already exists" });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = new User({ name, mobile, email, password: hashedPassword, state, address, language });
+        const newUser = new User({ name, mobile, email, password: hashedPassword, state, address, language, userId });
         await newUser.save();
 
         res.status(201).json({ message: "User registered successfully" });
@@ -48,7 +53,7 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, "your_jwt_secret", { expiresIn: "1h" });
 
-        res.status(200).json({ message: "Login successful", token, userId: user._id });  
+        res.status(200).json({ message: "Login successful", token, userId: user._id });
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
@@ -76,21 +81,21 @@ exports.getUsers = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
-      const { id } = req.params;
-      const deletedUser = await User.findByIdAndDelete(id);
-  
-      if (!deletedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      res.status(200).json({ message: "User deleted successfully" });
+        const { id } = req.params;
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server error" });
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
     }
-  };
-  
-  exports.getUserProfile = async (req, res) => {
+};
+
+exports.getUserProfile = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1]; // Extract Bearer token
         if (!token) return res.status(401).json({ error: "Unauthorized" });
@@ -111,4 +116,3 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
-  

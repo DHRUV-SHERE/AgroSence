@@ -1,4 +1,5 @@
 const express = require("express");
+const agro_users = mongoose.connection.collection("agro_users")
 const { signup, login } = require("../controllers/authController"); // Removed getUsers since it's defined here
 const authController = require("../controllers/authController");
 const User = require("../models/User");
@@ -73,7 +74,7 @@ router.put("/users/:id", async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
+  
 router.get("/user", authController.getUserProfile);  
 router.post("/signup", signup);
 router.post("/login", login);
