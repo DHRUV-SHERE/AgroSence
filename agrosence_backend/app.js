@@ -68,7 +68,7 @@ app.post("/api/chatbot", async (req, res) => {
   res.json({ answer: botResponse });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
