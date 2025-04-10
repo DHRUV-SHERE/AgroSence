@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
-import axios from "axios";
+import api from "../../api";
 import { resource } from "../resource"
 
 const ProfileModal = ({ onClose }) => {
@@ -18,7 +18,7 @@ const ProfileModal = ({ onClose }) => {
                     return;
                 }
         
-                const response = await axios.get(`http://localhost:5000/api/auth/users/${userId}`, {
+                const response = await api.get(`http://localhost:5000/api/auth/users/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
         

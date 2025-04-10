@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { resource } from "../resource";
 import { FaPaperPlane } from "react-icons/fa"; // Send icon
-import axios from "axios";
+import api from "../../api";
 
 const Chatbot = () => {
   const [isChatboxVisible, setIsChatboxVisible] = useState(false);
@@ -36,7 +36,7 @@ const Chatbot = () => {
       setIsLoading(true);
   
       try {
-        const response = await axios.post("http://localhost:5000/api/chatbot", {
+        const response = await api.post("http://localhost:5000/api/chatbot", {
           message: message,
         });
   

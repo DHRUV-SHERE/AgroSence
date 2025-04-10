@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit2 } from "react-icons/fi";
 import Layout from "../components/dashboard/Layout";
-import axios from "axios";
+import api from "../api";
 import { resource } from "../resource";
 
 const Settings = () => {
@@ -31,7 +31,7 @@ const Settings = () => {
           return;
         }
 
-        const response = await axios.get(`http://localhost:5000/api/auth/users/${userId}`, {
+        const response = await api.get(`http://localhost:5000/api/auth/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -78,7 +78,7 @@ const Settings = () => {
       const updatedUser = { ...user };
       delete updatedUser.password; // Do not send empty password if not changing it
 
-      await axios.put(`http://localhost:5000/api/auth/users/${userId}`, updatedUser, {
+      await api.put(`http://localhost:5000/api/auth/users/${userId}`, updatedUser, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

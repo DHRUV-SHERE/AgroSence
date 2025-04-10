@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Card, Badge, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import api from "../api";
 
 const CropDetail = () => {
   const { id } = useParams(); // Get crop ID from URL
@@ -13,7 +13,7 @@ const CropDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/crops/${id}`);
+      const response = await api.get(`http://localhost:5000/api/crops/${id}`);
       setProduct(response.data);
     } catch (error) {
       console.error("Error fetching product details:", error);

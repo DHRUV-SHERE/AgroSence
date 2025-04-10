@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { resource } from "../resource"; // Replace with actual resource imports
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
@@ -35,7 +35,7 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const response = await api.post(
         "http://localhost:5000/api/auth/signup",
         formData
       );

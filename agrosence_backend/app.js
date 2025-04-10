@@ -1,7 +1,8 @@
 const express = require("express");
 const connectDB = require("./src/config/db");
 const contactFormRoutes = require('./src/routes/contactFormRoutes');
-const cors = require("cors");
+// const cors = require("cors");
+app.use(cors({ origin:"https://agrosence.vercel.app/"}));
 require("dotenv").config();
 const authRoutes = require("./src/routes/authRoutes");
 const agricultureRoutes = require("./src/routes/agricultureRoutes");
@@ -22,6 +23,14 @@ app.use(cors());
 // Database Connection
 connectDB();
 
+app.use(
+    cors({
+      origin: "https://your-frontend.vercel.app", // replace with actual deployed frontend URL
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      credentials: true, // only if you're using cookies/sessions
+    })
+  );
+  
 // Routes
 app.use("/uploads", express.static("uploads")); 
 app.use("/api/resources", resourceRoutes);

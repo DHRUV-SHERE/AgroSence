@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import Layout from "../components/dashboard/Layout";
 
 const MarketAccessHistory = () => {
@@ -18,7 +18,7 @@ const MarketAccessHistory = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await api.get(
           `http://localhost:5000/api/auth/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -38,7 +38,7 @@ const MarketAccessHistory = () => {
 
       try {
         const token = localStorage.getItem("authToken");
-        const response = await axios.get(
+        const response = await api.get(
           `http://localhost:5000/api/orders/${user._id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );

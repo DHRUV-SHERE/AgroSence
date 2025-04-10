@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from "react-bootstrap";
-import axios from "axios";
+import api from "../api";
 import Layout from "../components/dashboard/Layout";
 
 const QuickSupport = () => {
@@ -18,7 +18,7 @@ const QuickSupport = () => {
     setLoading(true);
   
     try {
-      const response = await axios.post("http://localhost:5000/api/support", formData, {
+      const response = await api.post("http://localhost:5000/api/support", formData, {
         headers: { "Content-Type": "application/json" },
       });
   

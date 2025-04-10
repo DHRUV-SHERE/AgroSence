@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { BsBell, BsList } from "react-icons/bs";
 import ProfileModal from "../../components/ProfileModel";
@@ -24,7 +24,7 @@ const Header = ({ toggleSidebar }) => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await api.get(
           `http://localhost:5000/api/auth/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -48,7 +48,7 @@ const Header = ({ toggleSidebar }) => {
     if (!user || !user._id) return;
 
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `http://localhost:5000/api/notifications/${user._id}`,
         {
           headers: {
@@ -73,7 +73,7 @@ const Header = ({ toggleSidebar }) => {
     if (!confirmDelete) return;
 
     try {
-      await axios.put(
+      await api.put(
         `http://localhost:5000/api/notifications/${notificationId}/update`,
         { status: "accepted" },
         {

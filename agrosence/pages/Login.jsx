@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api"; // Adjust the import path as necessary
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { BsCheck2Square } from "react-icons/bs";
 import loadingGif from "../src/assets/Chatbot2.gif";
@@ -30,7 +30,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const response = await api.post(
         "http://localhost:5000/api/auth/login",
         {
           mobile: phone,

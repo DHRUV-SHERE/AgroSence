@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, Card, Button, Row, Col, Modal, Badge, Alert } from "react-bootstrap";
-import axios from "axios";
+import api from "../../api";
 
 const MarketAccess = () => {
   const [crops, setCrops] = useState([]);
@@ -16,7 +16,7 @@ const MarketAccess = () => {
 
   const fetchCrops = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/crops");
+      const response = await api.get("http://localhost:5000/api/crops");
       setCrops(response.data);
     } catch (error) {
       console.error("Error fetching crops:", error);
@@ -33,7 +33,7 @@ const MarketAccess = () => {
         return;
       }
 
-      const response = await axios.get(
+      const response = await api.get(
         `http://localhost:5000/api/auth/users/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -58,7 +58,7 @@ const MarketAccess = () => {
     setNotification("");
 
     try {
-      await axios.post(
+      await api.post(
         "http://localhost:5000/api/orders",
         {
           sellerId: selectedCrop.userId._id,

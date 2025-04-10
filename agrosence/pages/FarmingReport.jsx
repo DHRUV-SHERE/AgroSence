@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api"; // Adjust the import path as necessary
 import { Card, Button } from "react-bootstrap";
 import Layout from "../components/dashboard/Layout";
 
@@ -20,7 +20,7 @@ const FarmingReport = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await api.get(
           `http://localhost:5000/api/auth/users/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -43,7 +43,7 @@ const FarmingReport = () => {
     const fetchOrders = async () => {
       try {
         const authToken = localStorage.getItem("authToken");
-        const response = await axios.get(`http://localhost:5000/api/orders`, {
+        const response = await api.get(`http://localhost:5000/api/orders`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
 
@@ -61,7 +61,7 @@ const FarmingReport = () => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      await axios.put(
+      await api.put(
         `http://localhost:5000/api/orders/${orderId}/status`,
         { status },
         {

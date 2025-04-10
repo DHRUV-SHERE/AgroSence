@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -16,7 +16,7 @@ const StateSchemes = () => {
   useEffect(() => {
     const fetchSchemes = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/schemes/all`);
+        const response = await api.get(`http://localhost:5000/api/schemes/all`);
         const filteredSchemes = response.data.data.filter(
           (scheme) => scheme.state.toLowerCase() === stateName.toLowerCase()
         );

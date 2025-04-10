@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api"; // Adjust the import path as necessary
 import Layout from "../components/dashboard/Layout";
 
 const LiveCropPrices = () => {
@@ -21,7 +21,7 @@ const LiveCropPrices = () => {
     const offset = (currentPage - 1) * pageSize;
 
     try {
-      const response = await axios.get(
+      const response = await api.get(
         "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
         {
           params: {
@@ -67,7 +67,7 @@ const LiveCropPrices = () => {
       for (let i = 0; i < 5; i++) {
         // 5 pages = ~200 records
         try {
-          const response = await axios.get(
+          const response = await api.get(
             "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
             {
               params: {

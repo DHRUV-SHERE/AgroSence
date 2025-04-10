@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "../../api";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -22,7 +22,7 @@ const ContactForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/contact/submit", formData);
+      await api.post("http://localhost:5000/api/contact/submit", formData);
       setSubmitted(true);
     } catch (error) {
       console.error("Error submitting form:", error);

@@ -9,7 +9,7 @@ import {
   Modal,
 } from "react-bootstrap";
 import { FiUpload, FiCheckCircle } from "react-icons/fi";
-import axios from "axios";
+import api from "../../api";
 
 const CropListingForm = () => {
   const [cropName, setCropName] = useState("");
