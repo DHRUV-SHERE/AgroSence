@@ -59,7 +59,7 @@ const CropListingForm = () => {
     images.forEach((img) => formData.append("cropImages", img.file));
 
     try {
-      const response = await fetch("http://localhost:5000/api/crops/add", {
+      const response = await fetch("/api/crops/add", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

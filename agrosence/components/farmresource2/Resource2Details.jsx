@@ -9,7 +9,7 @@ const ResourceDetail = () => {
   const [resource, setResource] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/resources/${_id}`)
+    fetch(`/api/resources/${_id}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Fetched resource:", data); // Debugging
@@ -108,7 +108,7 @@ const ResourceDetail = () => {
                 <img
                   src={
                     resource.image
-                      ? `http://localhost:5000${resource.image}`
+                      ? `/${resource.image}`
                       : "/placeholder.svg"
                   }
                   alt={resource.name}

@@ -16,7 +16,7 @@ const StateSchemes = () => {
   useEffect(() => {
     const fetchSchemes = async () => {
       try {
-        const response = await api.get(`http://localhost:5000/api/schemes/all`);
+        const response = await api.get(`/api/schemes/all`);
         const filteredSchemes = response.data.data.filter(
           (scheme) => scheme.state.toLowerCase() === stateName.toLowerCase()
         );

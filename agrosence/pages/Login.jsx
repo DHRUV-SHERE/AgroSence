@@ -31,7 +31,7 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await api.post(
-        "http://localhost:5000/api/auth/login",
+        "/api/auth/login",
         {
           mobile: phone,
           password: password,

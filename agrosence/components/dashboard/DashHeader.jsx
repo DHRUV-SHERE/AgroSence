@@ -25,7 +25,7 @@ const Header = ({ toggleSidebar }) => {
         }
 
         const response = await api.get(
-          `http://localhost:5000/api/auth/users/${userId}`,
+          `/api/auth/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -49,7 +49,7 @@ const Header = ({ toggleSidebar }) => {
 
     try {
       const response = await api.get(
-        `http://localhost:5000/api/notifications/${user._id}`,
+        `/api/notifications/${user._id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -74,7 +74,7 @@ const Header = ({ toggleSidebar }) => {
 
     try {
       await api.put(
-        `http://localhost:5000/api/notifications/${notificationId}/update`,
+        `/api/notifications/${notificationId}/update`,
         { status: "accepted" },
         {
           headers: {

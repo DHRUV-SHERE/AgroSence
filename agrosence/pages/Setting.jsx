@@ -31,7 +31,7 @@ const Settings = () => {
           return;
         }
 
-        const response = await api.get(`http://localhost:5000/api/auth/users/${userId}`, {
+        const response = await api.get(`/api/auth/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -78,7 +78,7 @@ const Settings = () => {
       const updatedUser = { ...user };
       delete updatedUser.password; // Do not send empty password if not changing it
 
-      await api.put(`http://localhost:5000/api/auth/users/${userId}`, updatedUser, {
+      await api.put(`/api/auth/users/${userId}`, updatedUser, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

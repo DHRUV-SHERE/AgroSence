@@ -18,7 +18,7 @@ const QuickSupport = () => {
     setLoading(true);
   
     try {
-      const response = await api.post("http://localhost:5000/api/support", formData, {
+      const response = await api.post("/api/support", formData, {
         headers: { "Content-Type": "application/json" },
       });
   

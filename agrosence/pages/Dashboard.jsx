@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [totalSales, setTotalSales] = useState(0);
   const [weather, setWeather] = useState(null);
 
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = "/api";
   const API_KEY = "5686d2e419a6f283b8269848f55722f4";
 
   useEffect(() => {

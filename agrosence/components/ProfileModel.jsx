@@ -18,7 +18,7 @@ const ProfileModal = ({ onClose }) => {
                     return;
                 }
         
-                const response = await api.get(`http://localhost:5000/api/auth/users/${userId}`, {
+                const response = await api.get(`/api/auth/users/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
         

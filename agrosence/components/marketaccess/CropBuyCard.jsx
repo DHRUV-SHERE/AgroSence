@@ -16,7 +16,7 @@ const MarketAccess = () => {
 
   const fetchCrops = async () => {
     try {
-      const response = await api.get("http://localhost:5000/api/crops");
+      const response = await api.get("/api/crops");
       setCrops(response.data);
     } catch (error) {
       console.error("Error fetching crops:", error);
@@ -34,7 +34,7 @@ const MarketAccess = () => {
       }
 
       const response = await api.get(
-        `http://localhost:5000/api/auth/users/${userId}`,
+        `/api/auth/users/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -59,7 +59,7 @@ const MarketAccess = () => {
 
     try {
       await api.post(
-        "http://localhost:5000/api/orders",
+        "/api/orders",
         {
           sellerId: selectedCrop.userId._id,
           buyerId: user._id,

@@ -21,7 +21,7 @@ const FarmingReport = () => {
         }
 
         const response = await api.get(
-          `http://localhost:5000/api/auth/users/${userId}`,
+          `/api/auth/users/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -43,7 +43,7 @@ const FarmingReport = () => {
     const fetchOrders = async () => {
       try {
         const authToken = localStorage.getItem("authToken");
-        const response = await api.get(`http://localhost:5000/api/orders`, {
+        const response = await api.get(`/api/orders`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
 
@@ -62,7 +62,7 @@ const FarmingReport = () => {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await api.put(
-        `http://localhost:5000/api/orders/${orderId}/status`,
+        `/api/orders/${orderId}/status`,
         { status },
         {
           headers: {

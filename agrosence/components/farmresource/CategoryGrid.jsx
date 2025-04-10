@@ -6,7 +6,7 @@ const CategoryGrid = () => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/resources/all")  // Fixed extra "/"
+    fetch("/api/resources/all")  // Fixed extra "/"
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch resources");

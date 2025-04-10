@@ -17,7 +17,7 @@ const CategoryCard = ({ category }) => {
       <div className="card-img-container" style={{ height: "300px", overflow: "hidden" }}>
         <Card.Img
           variant="top"
-          src={category.image ? `http://localhost:5000${category.image}` : "NO image Found"}
+          src={category.image ? `/${category.image}` : "NO image Found"}
           alt={category.name}
           className="img-fluid p-1"
           style={{

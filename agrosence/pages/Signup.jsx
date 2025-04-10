@@ -36,7 +36,7 @@ const SignUpPage = () => {
     e.preventDefault();
     try {
       const response = await api.post(
-        "http://localhost:5000/api/auth/signup",
+        "/api/auth/signup",
         formData
       );
       setMessage(response.data.message);

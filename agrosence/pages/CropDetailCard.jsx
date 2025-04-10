@@ -13,7 +13,7 @@ const CropDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await api.get(`http://localhost:5000/api/crops/${id}`);
+      const response = await api.get(`/api/crops/${id}`);
       setProduct(response.data);
     } catch (error) {
       console.error("Error fetching product details:", error);
@@ -29,7 +29,7 @@ const CropDetail = () => {
           {/* Crop Image */}
           <Col md={6} className="d-flex align-items-center">
             <img
-              src={product.cropImages?.[0] ? `http://localhost:5000${product.cropImages[0]}` : "/placeholder.png"}
+              src={product.cropImages?.[0] ? `/${product.cropImages[0]}` : "/placeholder.png"}
               alt={product.cropName || "Crop Image"}
               className="img-fluid rounded"
               style={{ maxHeight: "350px", objectFit: "cover" }}
