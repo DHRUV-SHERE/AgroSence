@@ -25,7 +25,7 @@ connectDB();
 
 app.use(
     cors({
-      origin: "https://your-frontend.vercel.app", // replace with actual deployed frontend URL
+      origin: "https://agrosence.vercel.app/", // replace with actual deployed frontend URL
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true, // only if you're using cookies/sessions
     })
