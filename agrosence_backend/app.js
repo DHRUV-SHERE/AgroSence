@@ -1,9 +1,11 @@
 const express = require("express");
+const app = express(); // ✅ define 'app' first
+
 const connectDB = require("./src/config/db");
 const contactFormRoutes = require('./src/routes/contactFormRoutes');
-// const cors = require("cors");
-app.use(cors({ origin:"https://agrosence.vercel.app/"}));
+const cors = require("cors");
 require("dotenv").config();
+
 const authRoutes = require("./src/routes/authRoutes");
 const agricultureRoutes = require("./src/routes/agricultureRoutes");
 const schemeRoutes = require("./src/routes/govSchemeRoutes");
@@ -14,23 +16,17 @@ const notificationRoutes = require("./src/routes/notificationRoutes");
 const orderRoutes = require("./src/routes/orderRoutes"); 
 const supportRoutes = require("./src/routes/supportRoutes");
 
-const app = express();
-
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "https://agrosence.vercel.app", // 🔁 Remove trailing slash
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 
 // Database Connection
 connectDB();
 
-app.use(
-    cors({
-      origin: "https://agrosence.vercel.app/", // replace with actual deployed frontend URL
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true, // only if you're using cookies/sessions
-    })
-  );
-  
 // Routes
 app.use("/uploads", express.static("uploads")); 
 app.use("/api/resources", resourceRoutes);
@@ -43,35 +39,36 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/support", supportRoutes);
 
+// Get all resources
 app.get("/api/resources/all", async (req, res) => {
-    try {
-        const resources = await ResourceModel.find();
-
-        res.json({
-            success: true,
-            data: resources.map(resource => ({
-                ...resource._doc,
-                image: resource.image ? `${req.protocol}://${req.get("host")}${resource.image}` : null
-            }))
-        });
-    } catch (error) {
-        console.error("Error fetching resources:", error);
-        res.status(500).json({ success: false, message: "Error fetching resources" });
-    }
+  try {
+    const resources = await ResourceModel.find();
+    res.json({
+      success: true,
+      data: resources.map(resource => ({
+        ...resource._doc,
+        image: resource.image ? `${req.protocol}://${req.get("host")}${resource.image}` : null
+      }))
+    });
+  } catch (error) {
+    console.error("Error fetching resources:", error);
+    res.status(500).json({ success: false, message: "Error fetching resources" });
+  }
 });
 
+// Chatbot route
 app.post("/api/chatbot", async (req, res) => {
-    const { message } = req.body;
-  
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
-    }
-  
-    const botResponse = await getGeminiResponse(message);
-    res.json({ answer: botResponse });
-  });
-  
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: "Message is required" });
+  }
+
+  const botResponse = await getGeminiResponse(message);
+  res.json({ answer: botResponse });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
