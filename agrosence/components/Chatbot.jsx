@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { resource } from "../resource";
 import { FaPaperPlane } from "react-icons/fa"; // Send icon
-import api from "../../api";
+import api from "../api";
 
 const Chatbot = () => {
   const [isChatboxVisible, setIsChatboxVisible] = useState(false);

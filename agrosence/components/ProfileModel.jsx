@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
-import api from "../../api";
+import api from "../api";
 import { resource } from "../resource"
 
 const ProfileModal = ({ onClose }) => {
