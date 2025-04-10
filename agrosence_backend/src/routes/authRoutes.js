@@ -1,5 +1,4 @@
 const express = require("express");
-const agro_users = mongoose.connection.collection("agro_users")
 const { signup, login } = require("../controllers/authController"); // Removed getUsers since it's defined here
 const authController = require("../controllers/authController");
 const User = require("../models/User");
