@@ -1,0 +1,662 @@
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  background-color: #252525;
+}
+.logo {
+  width: 120px; /* Adjust size */
+  height: 120px;
+}
+.app-name {
+  color: white;
+  font-weight: bold;
+  font-size: 3rem;
+  margin-top: 20px;
+}
+
+.navbar .logoname{
+  font-family: 'Martel', serif;
+}
+.logoname{
+  font-family: 'Martel', serif;
+}
+
+.main-content {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* About Section CSS */
+.hero-section {
+  position: relative;
+  background-attachment: fixed;
+}
+
+.hero-section .overlay {
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+}
+
+
+.card {
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 300px !important;
+  }
+
+  .hero-section h1 {
+    font-size: 2.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 300px !important; /* Reduced height for mobile view */
+    background-position: center !important; /* Center the background image */
+    background-size: cover !important; /* Ensure the background image covers the container */
+  }
+
+  .hero-section h1 {
+    font-size: 2.5rem !important; /* Adjust font size for mobile view */
+  }
+}
+
+/* Feature */
+.feature-card {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: white;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.btn-success {
+  background-color: #34a853;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.btn-success:hover {
+  background-color: #34a853;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+  }
+
+  .flex-grow-1 {
+    margin-left: 0 !important;
+  }
+}
+
+/* Custom scrollbar for sidebar and lists */
+.sidebar-content::-webkit-scrollbar,
+.list-group::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb,
+.list-group::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-track,
+.list-group::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Custom styles for the settings page */
+.nav-tabs .nav-link {
+  color: #6c757d;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 0;
+  margin-right: 1.5rem;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  background: none;
+  border: none;
+  border-bottom: 2px solid #0d6efd;
+}
+
+.form-control {
+  padding: 0.75rem 1rem;
+}
+
+.form-label {
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem !important;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* App.css */
+@media (max-width: 768px) {
+  .navbar-nav .nav-item .nav-link{
+    color: black;
+  }
+
+  .navbar-toggler {
+    border-color: white; /* Optional: Change toggle button border color for better contrast */
+  }
+
+}
+
+
+/* Chatbot */
+/* src/components/Chatbot.css */
+
+/* Chatbot Button */
+.chatbot-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 75px;
+  height: 75px;
+  background-color: #009444;
+  border: 2px solid #009444;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  overflow: hidden;
+}
+
+.chatbot-button:hover {
+  background-color: #009444;
+  transform: scale(1.1);
+}
+
+.chatbot-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Chatbox */
+.chatbox {
+  position: fixed;
+  bottom: 110px; /* Adjust the bottom position for chatbox */
+  margin: auto;
+  right: 20px;
+  width: 30rem;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.chatbox-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chatbox-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.chatbox-header h3 {
+  margin: 0;
+}
+
+.chatbox-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Loading Effect */
+.loading {
+  display: inline-block;
+  font-size: 16px;
+  color: #555;
+}
+
+.loading:after {
+  content: "...";
+  animation: typing 1.5s steps(5) infinite;
+}
+
+@keyframes typing {
+  0% {
+    content: ".";
+  }
+  25% {
+    content: "..";
+  }
+  50% {
+    content: "...";
+  }
+  75% {
+    content: "..";
+  }
+  100% {
+    content: ".";
+  }
+}
+
+.chatbox-footer {
+  background-color: #009444;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.chatbox-input {
+  width: 80%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.send-button {
+  background-color: #009444;
+  color: white;
+  border: 2px solid ;
+  padding: 6px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.send-button:hover {
+  background-color: green;
+}
+
+/* Chatbot */
+
+/* User Messages */
+.user-message {
+  display: flex;
+  justify-content: flex-end; /* Aligns user messages to the right */
+  margin-bottom: 10px;
+}
+
+.user-message span {
+  background-color: #d1e7fd; /* Light blue for user messages */
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  max-width: 70%;
+  text-align: right; /* Aligns text inside the user message to the right */
+}
+
+/* Bot Messages */
+.bot-message {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.bot-message img {
+  margin-right: 10px; /* Adds space between the bot's logo and the message */
+}
+
+.bot-message span,
+.bot-message p {
+  background-color: #f0f0f0; /* Light gray for bot messages */
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  max-width: 70%;
+  text-align: left; /* Aligns text inside the bot message to the left */
+}
+
+/* OrderHistory */
+/* Custom styles for order history page */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  padding: 1rem;
+}
+
+.table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem !important;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Government Scheme */
+.scheme-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.scheme-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.quick-reports {
+  height: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.news-item {
+  transition: background-color 0.2s;
+}
+
+.news-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.card-background {
+  transition: opacity 0.2s;
+}
+
+.scheme-card:hover .card-background {
+  opacity: 0.3;
+}
+
+/* Market Access */
+/* General Content Section */
+.content-section {
+  transition: all 0.3s ease;
+  padding: 3rem 1rem;
+}
+
+.content-section:hover {
+  transform: translateY(-5px);
+}
+
+.icon-wrapper {
+  transition: all 0.3s ease;
+}
+
+.content-section:hover .icon-wrapper {
+  transform: scale(1.1);
+}
+
+/* Buttons */
+.action-btn {
+  padding: 12px 32px;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  transition: 0.3s ease-in-out;
+}
+
+.action-btn:hover {
+  background-color: #2d6a4f;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  min-height: 300px;
+  background-image: url('../../resource/GovBG.src');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-content {
+  position: relative;
+  padding: 5rem 2rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+/* Dark Overlay */
+.dark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .content-section {
+    padding: 2rem;
+  }
+
+  .action-btn {
+    font-size: 1rem;
+    padding: 10px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 200px;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .content-section {
+    padding: 1.5rem;
+  }
+
+  .lead {
+    font-size: 1rem !important;
+  }
+
+  .action-btn {
+    font-size: 0.9rem;
+    padding: 8px 20px;
+  }
+}
+
+/* State Scheme css */
+.scheme-header {
+  background: linear-gradient(135deg, #1e4d92 0%, #2c7cd1 100%);
+}
+
+.scheme-card {
+  transition: transform 0.2s;
+  border: none;
+}
+
+.scheme-card:hover {
+  transform: translateY(-5px);
+}
+
+.scheme-details h4 {
+  color: #555;
+  font-weight: 600;
+}
+
+.scheme-card .card-title {
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .scheme-header h1 {
+    font-size: 2rem;
+  }
+
+  .scheme-header .lead {
+    font-size: 1rem;
+  }
+}
+
+/* Profile model */
+.profile-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.profile-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.profile-body p {
+  font-weight: 500;
+}
+
+.close-icon {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* Farming Routine */
+.farming-routine-container {
+  /* background-color: #f8f9fa;s */
+}
+
+.task-icon {
+  font-size: 1.5rem;
+  color: #198754; /* Bootstrap success color */
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.divider::before {
+  margin-right: 1rem;
+}
+
+.divider::after {
+  margin-left: 1rem;
+}
+
+.divider-text {
+  padding: 0.5rem 1rem;
+  background-color: #198754;
+  color: white;
+  border-radius: 0.25rem;
+  font-weight: bold;
+}
+
+/* Card hover effects */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Video thumbnail hover effect */
+.card-img-top {
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  opacity: 0.9;
+}
+
