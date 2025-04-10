@@ -4,7 +4,7 @@ const API_BASE_URL = "https://agrosence-1.onrender.com"; // ✅ Hardcoded backen
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // only if you’re using cookies/sessions
+  // withCredentials: true, 
 });
 
 export default api;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../api"; // Adjust the import path as necessary
 import Layout from "../components/dashboard/Layout";
+import axios from "axios";
 
 const LiveCropPrices = () => {
   const [cropData, setCropData] = useState([]);
@@ -21,12 +22,11 @@ const LiveCropPrices = () => {
     const offset = (currentPage - 1) * pageSize;
 
     try {
-      const response = await api.get(
+      const response = await axios.get(
         "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
         {
           params: {
-            "api-key":
-              "579b464db66ec23bdd000001c249d71a1de243177596a5b0ab5305b4",
+            "api-key": "579b464db66ec23bdd000001c249d71a1de243177596a5b0ab5305b4",
             format: "json",
             limit: pageSize,
             offset: offset,
