@@ -9,7 +9,7 @@ const ResourceDetail = () => {
   const [resource, setResource] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/resources/${_id}`)
+    fetch(`https://agrosence-1.onrender.com/api/resources/${_id}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Fetched resource:", data); // Debugging
