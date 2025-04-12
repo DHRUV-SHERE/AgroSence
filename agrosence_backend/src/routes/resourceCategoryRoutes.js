@@ -52,10 +52,17 @@ router.post("/add", upload.single("image"), async (req, res) => {
 // Get all resources
 router.get("/all", async (req, res) => {
   try {
-    const resources = await Resource.find();
-    res.status(200).json({ data: resources });
+    const resources = await ResourceModel.find();
+    res.json({
+      success: true,
+      data: resources.map(resource => ({
+        ...resource._doc,
+        image: resource.image ? `${req.protocol}://${req.get("host")}${resource.image}` : null
+      }))
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Error fetching resources:", error);
+    res.status(500).json({ success: false, message: "Error fetching resources" });
   }
 });
 

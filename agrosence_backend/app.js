@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express(); // ✅ define 'app' first
-const ResourceModel = require("./src/models/ResourceCategory");
 const connectDB = require("./src/config/db");
 const contactFormRoutes = require('./src/routes/contactFormRoutes');
 const cors = require("cors");
@@ -38,23 +37,6 @@ app.use("/api/agriculture", agricultureRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/support", supportRoutes);
-
-// Get all resources
-app.get("/api/resources/all", async (req, res) => {
-  try {
-    const resources = await ResourceModel.find();
-    res.json({
-      success: true,
-      data: resources.map(resource => ({
-        ...resource._doc,
-        image: resource.image ? `${req.protocol}://${req.get("host")}${resource.image}` : null
-      }))
-    });
-  } catch (error) {
-    console.error("Error fetching resources:", error);
-    res.status(500).json({ success: false, message: "Error fetching resources" });
-  }
-});
 
 // Chatbot route
 app.post("/api/chatbot", async (req, res) => {
