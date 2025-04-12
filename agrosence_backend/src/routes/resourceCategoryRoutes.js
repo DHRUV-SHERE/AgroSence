@@ -1,27 +1,34 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const path = require("path");
 const Resource = require("../models/ResourceCategory");
 
-// Fix storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Ensure 'uploads/' exists
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+// ✅ Cloudinary Setup
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "crop_images",
+    allowed_formats: ["jpg", "png", "jpeg"],
   },
 });
 
-
 const upload = multer({ storage });
 
-// Fix route definition (change `app.post` to `router.post`)
+// ✅ Add Resource (Cloudinary Upload)
 router.post("/add", upload.single("image"), async (req, res) => {
   try {
     console.log("Received body:", req.body);
-    console.log("Received file:", req.file);
+    console.log("Uploaded file via Cloudinary:", req.file);
 
     const { name, description, link, purpose, advantages, howtouse, popularbrand } = req.body;
 
@@ -29,7 +36,8 @@ router.post("/add", upload.single("image"), async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const imagePath = `/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path; // ✅ Cloudinary provides full URL
+
     const newResource = new Resource({
       name,
       description,
@@ -38,7 +46,7 @@ router.post("/add", upload.single("image"), async (req, res) => {
       advantages,
       howtouse,
       popularbrand,
-      image: imagePath,
+      image: imageUrl, // ✅ Save Cloudinary URL
     });
 
     await newResource.save();
@@ -49,16 +57,13 @@ router.post("/add", upload.single("image"), async (req, res) => {
   }
 });
 
-// Get all resources
+// ✅ Get All Resources (no need to append domain)
 router.get("/all", async (req, res) => {
   try {
     const resources = await Resource.find();
     res.json({
       success: true,
-      data: resources.map(resource => ({
-        ...resource._doc,
-        image: resource.image ? `${req.protocol}://${req.get("host")}${resource.image}` : null
-      }))
+      data: resources,
     });
   } catch (error) {
     console.error("Error fetching resources:", error);
@@ -66,6 +71,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
+// ✅ Get Single Resource by ID
 router.get("/:_id", async (req, res) => {
   try {
     console.log("Fetching resource with ID:", req.params._id);
@@ -80,7 +86,7 @@ router.get("/:_id", async (req, res) => {
   }
 });
 
-// Update a resource
+// ✅ Update Resource (no image change for now)
 router.put("/update/:id", async (req, res) => {
   try {
     const updatedResource = await Resource.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -90,7 +96,7 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
-// Delete a resource
+// ✅ Delete Resource
 router.delete("/delete/:id", async (req, res) => {
   try {
     await Resource.findByIdAndDelete(req.params.id);
