@@ -107,7 +107,7 @@ const ResourceDetail = () => {
               >
                 <img
                   src={resource.image
-                    ? `/${resource.image}`
+                    ? `${resource.image}`
                     : "/placeholder.svg"}
                   alt={resource.name}
                   className="img-fluid w-100 h-100 object-fit-cover"
