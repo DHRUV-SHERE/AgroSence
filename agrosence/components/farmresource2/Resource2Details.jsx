@@ -106,11 +106,7 @@ const ResourceDetail = () => {
                 style={{ width: "300px", height: "300px" }}
               >
                 <img
-                  src={
-                    resource.image
-                      ? `/${resource.image}`
-                      : "/placeholder.svg"
-                  }
+                  src={resource.image ||  "/placeholder.svg"}
                   alt={resource.name}
                   className="img-fluid w-100 h-100 object-fit-cover"
                 />
