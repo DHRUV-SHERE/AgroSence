@@ -9,15 +9,21 @@ const CategoryCard = ({ category }) => {
   };
 
   return (
-    <Card 
+    <Card
       className="h-100 category-card bg-light border-0 shadow-sm"
       onClick={handleClick}
       style={{ cursor: "pointer" }}
     >
-      <div className="card-img-container" style={{ height: "300px", overflow: "hidden" }}>
+      <div
+        className="card-img-container"
+        style={{ height: "300px", overflow: "hidden" }}
+      >
         <Card.Img
           variant="top"
-          src={category.image ? `/${category.image}` : "NO image Found"}
+          src={
+            category.image || `${category.image}` ||
+            "https://via.placeholder.com/300x200?text=No+Image"
+          }
           alt={category.name}
           className="img-fluid p-1"
           style={{
