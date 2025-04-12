@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express(); // ✅ define 'app' first
-
+const ResourceModel = require("./src/models/ResourceCategory");
 const connectDB = require("./src/config/db");
 const contactFormRoutes = require('./src/routes/contactFormRoutes');
 const cors = require("cors");
