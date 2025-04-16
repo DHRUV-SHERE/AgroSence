@@ -21,7 +21,7 @@ const FarmingReport = () => {
         }
 
         const response = await api.get(
-          `/api/auth/users/${userId}`,
+          `https://agrosence-1.onrender.com/api/auth/users/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -43,7 +43,7 @@ const FarmingReport = () => {
     const fetchOrders = async () => {
       try {
         const authToken = localStorage.getItem("authToken");
-        const response = await api.get(`/api/orders`, {
+        const response = await api.get(`https://agrosence-1.onrender.com/api/orders`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
 
@@ -62,7 +62,7 @@ const FarmingReport = () => {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await api.put(
-        `/api/orders/${orderId}/status`,
+        `https://agrosence-1.onrender.com/api/orders/${orderId}/status`,
         { status },
         {
           headers: {
