@@ -59,7 +59,7 @@ const CropListingForm = () => {
     images.forEach((img) => formData.append("cropImages", img.file));
 
     try {
-      const response = await fetch("/api/crops/add", {
+      const response = await fetch("https://agrosence-1.onrender.com/api/crops/add", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -82,7 +82,7 @@ const MarketAccess = () => {
         }
       );
 
-      await axios.post("http://localhost:5000/api/notifications", {
+      await axios.post("/api/notifications", {
         sellerId: selectedCrop.userId._id, // this must be from crop or DB
         buyerId: user._id, // from token or session
         cropId: selectedCrop._id,
