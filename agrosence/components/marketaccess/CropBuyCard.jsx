@@ -25,7 +25,7 @@ const MarketAccess = () => {
 
   const fetchCrops = async () => {
     try {
-      const response = await api.get("/api/crops");
+      const response = await api.get("https://agrosence-1.onrender.com/api/crops");
       setCrops(response.data);
     } catch (error) {
       console.error("Error fetching crops:", error);
@@ -42,7 +42,7 @@ const MarketAccess = () => {
         return;
       }
 
-      const response = await api.get(`/api/auth/users/${userId}`, {
+      const response = await api.get(`https://agrosence-1.onrender.com/api/auth/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -67,7 +67,7 @@ const MarketAccess = () => {
 
     try {
       await api.post(
-        "/api/orders",
+        "https://agrosence-1.onrender.com/api/orders",
         {
           sellerId: selectedCrop.userId._id,
           buyerId: user._id,
@@ -82,7 +82,7 @@ const MarketAccess = () => {
         }
       );
 
-      await axios.post("/api/notifications", {
+      await axios.post("https://agrosence-1.onrender.com/api/notifications", {
         sellerId: selectedCrop.userId._id, // this must be from crop or DB
         buyerId: user._id, // from token or session
         cropId: selectedCrop._id,

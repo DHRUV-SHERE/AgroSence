@@ -39,7 +39,7 @@ const MarketAccessHistory = () => {
       try {
         const token = localStorage.getItem("authToken");
         const response = await api.get(
-          `/api/orders/${user._id}`,
+          `https://agrosence-1.onrender.com/api/orders/${user._id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
