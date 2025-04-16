@@ -9,6 +9,7 @@ import {
   Badge,
   Alert,
 } from "react-bootstrap";
+import axios from "axios";
 import api from "../../api";
 
 const MarketAccess = () => {
