@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Container, Card, Button, Row, Col, Modal, Badge, Alert } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Button,
+  Row,
+  Col,
+  Modal,
+  Badge,
+  Alert,
+} from "react-bootstrap";
 import api from "../../api";
 
 const MarketAccess = () => {
@@ -33,10 +42,9 @@ const MarketAccess = () => {
         return;
       }
 
-      const response = await api.get(
-        `/api/auth/users/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.get(`/api/auth/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setUser(response.data);
     } catch (error) {
@@ -68,9 +76,18 @@ const MarketAccess = () => {
           totalPrice: selectedCrop.cropSellingPrice,
         },
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
         }
       );
+
+      await axios.post("http://localhost:5000/api/notifications", {
+        sellerId: selectedCrop.userId._id, // this must be from crop or DB
+        buyerId: user._id, // from token or session
+        cropId: selectedCrop._id,
+        message: `You received a new order request for ${selectedCrop.name}`,
+      });
 
       setNotification("Order placed! The seller has been notified.");
       setShowModal(false);
@@ -98,7 +115,9 @@ const MarketAccess = () => {
               <Card.Body>
                 <Card.Title>{crop.cropName}</Card.Title>
                 <Badge bg="success">{crop.cropCategory}</Badge>
-                <p className="text-muted mt-2">₹{crop.cropSellingPrice}/{crop.cropUnit}</p>
+                <p className="text-muted mt-2">
+                  ₹{crop.cropSellingPrice}/{crop.cropUnit}
+                </p>
                 <Button variant="primary" onClick={() => handleShowModal(crop)}>
                   View Details
                 </Button>
@@ -109,7 +128,12 @@ const MarketAccess = () => {
       </Row>
 
       {/* Crop Detail Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="lg"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>{selectedCrop?.cropName} Details</Modal.Title>
         </Modal.Header>
@@ -131,15 +155,29 @@ const MarketAccess = () => {
                 <h4 className="text-success">
                   ₹{selectedCrop.cropSellingPrice}/{selectedCrop.cropUnit}
                 </h4>
-                <p><strong>Category:</strong> {selectedCrop.cropCategory}</p>
-                <p><strong>Description:</strong> {selectedCrop.cropDescription}</p>
-                <p><strong>Quantity:</strong> {selectedCrop.cropQuantity} {selectedCrop.cropUnit}</p>
+                <p>
+                  <strong>Category:</strong> {selectedCrop.cropCategory}
+                </p>
+                <p>
+                  <strong>Description:</strong> {selectedCrop.cropDescription}
+                </p>
+                <p>
+                  <strong>Quantity:</strong> {selectedCrop.cropQuantity}{" "}
+                  {selectedCrop.cropUnit}
+                </p>
                 <p>
                   <strong>Grown Organically:</strong>{" "}
-                  {selectedCrop.grownOrganically === "true" ? "✅ Yes" : "❌ No"}
+                  {selectedCrop.grownOrganically === "true"
+                    ? "✅ Yes"
+                    : "❌ No"}
                 </p>
-                <p><strong>Crop Status:</strong> {selectedCrop.cropStatus || "Available"}</p>
-                <p><strong>Crop ID:</strong> {selectedCrop._id}</p>
+                <p>
+                  <strong>Crop Status:</strong>{" "}
+                  {selectedCrop.cropStatus || "Available"}
+                </p>
+                <p>
+                  <strong>Crop ID:</strong> {selectedCrop._id}
+                </p>
               </Col>
             </Row>
           )}
@@ -148,9 +186,15 @@ const MarketAccess = () => {
           {selectedCrop?.userId && (
             <Card className="mt-4 p-3 bg-light">
               <h5>Seller Information</h5>
-              <p><strong>Name:</strong> {selectedCrop.userId.name}</p>
-              <p><strong>Mobile:</strong> {selectedCrop.userId.mobile}</p>
-              <p><strong>Location:</strong> {selectedCrop.userId.state}</p>
+              <p>
+                <strong>Name:</strong> {selectedCrop.userId.name}
+              </p>
+              <p>
+                <strong>Mobile:</strong> {selectedCrop.userId.mobile}
+              </p>
+              <p>
+                <strong>Location:</strong> {selectedCrop.userId.state}
+              </p>
             </Card>
           )}
         </Modal.Body>
@@ -159,7 +203,8 @@ const MarketAccess = () => {
             variant="success"
             onClick={handleBuyNow}
             disabled={
-              user?._id === selectedCrop?.userId?._id || selectedCrop?.cropStatus === "Not Available"
+              user?._id === selectedCrop?.userId?._id ||
+              selectedCrop?.cropStatus === "Not Available"
             }
           >
             Buy Now

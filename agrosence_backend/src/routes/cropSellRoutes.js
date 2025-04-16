@@ -68,13 +68,13 @@ router.post("/add", upload.array("cropImages", 4), async (req, res) => {
       cropName,
       cropDescription,
       cropCategory,
-      cropSellingPrice,
+      cropSellingPrice: Number(cropSellingPrice),
       cropUnit,
-      cropQuantity,
+      cropQuantity: Number(cropQuantity),
       grownOrganically: grownOrganically === "true" ? "Yes" : "No",
       cropImages,
       userId,
-    });
+    });  
 
     await newCrop.save();
     res.status(201).json({ message: "✅ Crop added successfully", crop: newCrop });
