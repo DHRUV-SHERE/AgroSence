@@ -19,7 +19,7 @@ const MarketAccessHistory = () => {
         }
 
         const response = await api.get(
-          `/api/auth/users/${userId}`,
+          `https://agrosence-1.onrender.com/api/auth/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
