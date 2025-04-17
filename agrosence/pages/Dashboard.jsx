@@ -19,7 +19,7 @@ const Dashboard = () => {
   const fetchOrders = async () => {
     try {
       const userId = localStorage.getItem("userId"); // Get user ID from local storage
-      const response = await fetch(`${API_URL}/orders/${userId}`);
+      const response = await fetch(`https://agrosence-1.onrender.com/${API_URL}/orders/${userId}`);
       const orders = await response.json();
       
       setOrders(orders);

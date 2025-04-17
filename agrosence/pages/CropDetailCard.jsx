@@ -13,7 +13,7 @@ const CropDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await api.get(`/api/crops/${id}`);
+      const response = await api.get(`https://agrosence-1.onrender.com/api/crops/${id}`);
       setProduct(response.data);
     } catch (error) {
       console.error("Error fetching product details:", error);

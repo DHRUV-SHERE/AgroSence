@@ -18,7 +18,7 @@ const QuickSupport = () => {
     setLoading(true);
   
     try {
-      const response = await api.post("/api/support", formData, {
+      const response = await api.post("https://agrosence-1.onrender.com/api/support", formData, {
         headers: { "Content-Type": "application/json" },
       });
   
