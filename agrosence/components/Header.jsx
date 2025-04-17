@@ -49,7 +49,7 @@ function Header() {
       >
         <div className="container-fluid px-4">
           {/* Logo Section */}
-          <a className="navbar-brand d-flex align-items-center p-1" href="/">
+          <a className="navbar-brand d-flex align-items-center p-1" href="/Home">
             <img
               src={resource.Logo2.src}
               alt={resource.Logo2.alt}
