@@ -34,12 +34,12 @@ const Chatbot = () => {
       setChatHistory([...chatHistory, { sender: "user", message: message }]);
       setMessage("");
       setIsLoading(true);
-  
+
       try {
         const response = await api.post("/api/chatbot", {
           message: message,
         });
-  
+
         const botMessage = response.data.answer;
         setChatHistory((prevChatHistory) => [
           ...prevChatHistory,
@@ -48,14 +48,17 @@ const Chatbot = () => {
       } catch (error) {
         setChatHistory((prevChatHistory) => [
           ...prevChatHistory,
-          { sender: "bot", message: "Sorry, I couldn't understand your question." },
+          {
+            sender: "bot",
+            message: "Sorry, I couldn't understand your question.",
+          },
         ]);
       }
-  
+
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div>
       {/* Chatbot Button */}
@@ -83,7 +86,12 @@ const Chatbot = () => {
               alt={resource.Logo2.alt}
               className="chatbox-image"
             />
-            <h3 style={{fontFamily:"martel"}} className="fw-light text-white">AgroBot</h3>
+            <h3
+              style={{ fontFamily: "martel" }}
+              className="fw-light text-white"
+            >
+              AgroBot
+            </h3>
           </div>
           {/* Body Section */}
           <div className="chatbox-body text-dark p-1">
@@ -105,7 +113,8 @@ const Chatbot = () => {
                 <span>{chat.message}</span>
               </div>
             ))}
-            {isLoading && <p className="loading">...</p>} {/* Show loading effect when typing */}
+            {isLoading && <p className="loading">...</p>}{" "}
+            {/* Show loading effect when typing */}
           </div>
 
           {/* Bottom Section - Input and Send Button */}
@@ -114,6 +123,11 @@ const Chatbot = () => {
               type="text"
               value={message}
               onChange={handleMessageChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSendMessage();
+                }
+              }}
               placeholder="Ask about farming..."
               className="chatbox-input"
             />
