@@ -132,23 +132,6 @@ const LoginPage = () => {
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <div className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    id="rememberMe"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                  />
-                  <label className="form-check-label" htmlFor="rememberMe">
-                    Remember me
-                  </label>
-                </div>
-                <Link to="/forgot-password" className="text-success">
-                  Forget Password?
-                </Link>
-              </div>
               <button type="submit" className="btn btn-success w-100">
                 Login
               </button>
