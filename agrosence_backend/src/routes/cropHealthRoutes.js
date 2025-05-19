@@ -33,7 +33,7 @@ router.post("/", upload.single("image"), async (req, res) => {
   try {
     const imageUrl = req.file.path;
 
-    const healthResponse = await axios.post("https://api.plant.id/v2/health_assessment", {
+    const healthResponse = await axios.post("https://crop.kindwise.com/api/v1/health-assessment", {
       api_key: process.env.PLANT_ID_HEALTH_API_KEY,
       images: [imageUrl],
       plant_language: "en",
