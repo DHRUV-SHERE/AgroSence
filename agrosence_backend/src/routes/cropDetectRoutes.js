@@ -72,4 +72,36 @@ router.post("/crop-detect", upload.single("image"), async (req, res) => {
   }
 });
 
+router.post("/crop-health", upload.single("image"), async (req, res) => {
+  try {
+    const imageUrl = req.file.path;
+
+    const healthResponse = await axios.post("https://api.plant.id/v2/health_assessment", {
+      api_key: process.env.PLANT_ID_HEALTH_API_KEY,
+      images: [imageUrl],
+      // modifiers can include ["crops_fast", "similar_images"] if needed
+      plant_language: "en",
+      disease_details: ["description"],
+    });
+
+    const suggestions = healthResponse.data?.health_assessment?.diseases;
+    const isHealthy = healthResponse.data?.is_healthy;
+
+    let status = isHealthy ? "Healthy ✅" : "Diseased ❌";
+    let notes = isHealthy
+      ? "No visible disease detected."
+      : suggestions?.map((d) => `${d.name}: ${d.disease_details?.description}`).join("\n") ||
+        "Possible disease detected, but no description found.";
+
+    res.json({
+      image: imageUrl,
+      status,
+      notes,
+    });
+  } catch (err) {
+    console.error("Health API Error:", err.response?.data || err.message);
+    res.status(500).json({ error: "Health detection failed." });
+  }
+});
+
 module.exports = router;

@@ -5,126 +5,159 @@ import axios from "axios";
 import { resource } from "../resource";
 
 function CropDetection() {
-  const [image, setImage] = useState(null);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [imageCrop, setImageCrop] = useState(null);
+  const [imageHealth, setImageHealth] = useState(null);
+  const [resultCrop, setResultCrop] = useState(null);
+  const [resultHealth, setResultHealth] = useState(null);
+  const [loadingCrop, setLoadingCrop] = useState(false);
+  const [loadingHealth, setLoadingHealth] = useState(false);
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-    setResult(null);
+  const handleCropImageChange = (e) => {
+    setImageCrop(e.target.files[0]);
+    setResultCrop(null);
   };
 
-  const handleUpload = async () => {
-    if (!image) return alert("Please select an image.");
+  const handleHealthImageChange = (e) => {
+    setImageHealth(e.target.files[0]);
+    setResultHealth(null);
+  };
 
+  const handleCropUpload = async () => {
+    if (!imageCrop) return alert("Please select a crop image.");
     const formData = new FormData();
-    formData.append("image", image);
+    formData.append("image", imageCrop);
 
-    setLoading(true);
+    setLoadingCrop(true);
     try {
       const response = await axios.post(
         "https://agrosence-1.onrender.com/api/crop-detect",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
-      setResult(response.data);
+      setResultCrop(response.data);
     } catch (error) {
-      console.error("Detection failed:", error);
-      alert("Crop detection failed. Please try another image.");
+      console.error("Crop detection failed:", error);
+      alert("Crop detection failed.");
     } finally {
-      setLoading(false);
+      setLoadingCrop(false);
+    }
+  };
+
+  const handleHealthUpload = async () => {
+    if (!imageHealth) return alert("Please select a leaf image.");
+    const formData = new FormData();
+    formData.append("image", imageHealth);
+
+    setLoadingHealth(true);
+    try {
+      const response = await axios.post(
+        "https://agrosence-1.onrender.com/api/crop-health",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      setResultHealth(response.data);
+    } catch (error) {
+      console.error("Health detection failed:", error);
+      alert("Crop health detection failed.");
+    } finally {
+      setLoadingHealth(false);
     }
   };
 
   return (
     <>
       <Navbar />
-
-      <div className="container flex mt-2 flex-col lg:flex-row justify-center items-start gap-10 p-6 lg:p-16 bg-gradient-to-br from-green-50 to-green-100 min-h-screen">
-        {/* LEFT: Upload and Result */}
+      <div className="container flex flex-col lg:flex-row justify-center items-start gap-10 p-6 lg:p-16 bg-gradient-to-br from-green-50 to-green-100 min-h-screen">
+        {/* Crop Detection Section */}
         <div className="w-full lg:w-1/2 bg-white p-8 rounded-2xl shadow-xl">
           <h2 className="text-3xl font-bold text-green-700 mb-4">
             🌿 Crop Detection
           </h2>
-          <p className="text-gray-600 mb-6">
-            Upload an image of a crop or plant to detect its scientific and
-            local name along with a description.
+          <p className="text-gray-600 mb-4">
+            Upload an image of a plant to detect its scientific and local names
+            along with a description.
           </p>
 
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
-            className="mb-4 block w-full border border-gray-300 p-2 rounded-lg"
+            onChange={handleCropImageChange}
+            className="mb-4 w-full border border-gray-300 p-2 rounded-lg"
           />
-
           <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="w-full py-2 bg-green-600 rounded-lg hover:bg-green-700 transition"
+            onClick={handleCropUpload}
+            disabled={loadingCrop}
+            className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
-            {loading ? "Detecting..." : "🔍 Detect Crop"}
+            {loadingCrop ? "Detecting..." : "🔍 Detect Crop"}
           </button>
 
-          {result && (
-            <div className="mt-8">
+          {resultCrop && (
+            <div className="mt-6 border-t pt-4">
               <img
-                src={result.image}
-                alt="Detected"
-                className="w-full h-60 object-cover rounded-xl border mb-4"
+                src={resultCrop.image}
+                alt="Detected Crop"
+                className="w-full h-52 object-cover rounded-xl mb-4"
               />
-              <h3 className="text-xl fw-bold font-semibold text-green-700">
+              <h4 className="text-lg text-green-800 font-semibold">
                 🌱 Scientific Name:
-              </h3>
-              <h4 className="italic text-gray-800 mb-3">
-                {result.scientificName}
               </h4>
-
-              {result.commonNames?.length > 0 && (
-                <>
-                  <h4 className="text-lg fw-bold font-medium text-blue-600">
-                    Local/Common Names:
-                  </h4>
-                  <h6 className="text-gray-700 mb-3">
-                    {result.commonNames.join(", ")}
-                  </h6>
-                </>
-              )}
-
-              <h4 className="text-lg fw-bold font-medium text-blue-600">
+              <p className="italic">{resultCrop.scientificName}</p>
+              <h4 className="text-lg mt-2 text-blue-700 font-medium">
+                Local Names:
+              </h4>
+              <p>{resultCrop.commonNames?.join(", ")}</p>
+              <h4 className="text-lg mt-2 text-blue-700 font-medium">
                 Description:
               </h4>
-              <h6 className="text-gray-700">{result.description}</h6>
+              <p className="text-gray-700">{resultCrop.description}</p>
             </div>
           )}
         </div>
 
-        {/* RIGHT: How It Works */}
-        <div className="w-full lg:w-1/2 p-6 bg-white rounded-2xl shadow-lg">
-          <img
-            src={resource.Aichatbot.src} // Replace with your image or illustration
-            alt="How it works"
-            className="mt-6 mb-6 srounded-xl w-25 h-25 p-5 shadow-md w-full"
+        {/* Crop Health Detection Section */}
+        <div className="w-full lg:w-1/2 bg-white p-8 rounded-2xl shadow-xl">
+          <h2 className="text-3xl font-bold text-red-700 mb-4">
+            🩺 Crop Health Detection
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Upload an image of a leaf to check if it’s healthy or has disease
+            symptoms.
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleHealthImageChange}
+            className="mb-4 w-full border border-gray-300 p-2 rounded-lg"
           />
-          <h3 className="text-2xl font-bold text-green-700 mb-4">
-            📘 How It Works
-          </h3>
-          <ul className="list-disc pl-5 space-y-2 text-gray-700">
-            <li>Choose or capture a clear image of a plant or crop.</li>
-            <li>Click the "Detect Crop" button to start identification.</li>
-            <li>Wait a few seconds while our AI analyzes your image.</li>
-            <li>
-              Get the plant’s scientific name, local names, and description
-              instantly!
-            </li>
-          </ul>
+          <button
+            onClick={handleHealthUpload}
+            disabled={loadingHealth}
+            className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            {loadingHealth ? "Analyzing..." : "🧪 Check Health"}
+          </button>
+
+          {resultHealth && (
+            <div className="mt-6 border-t pt-4">
+              <img
+                src={resultHealth.image}
+                alt="Health Result"
+                className="w-full h-52 object-cover rounded-xl mb-4"
+              />
+              <h4 className="text-lg font-semibold text-red-700">
+                🌿 Health Status:
+              </h4>
+              <p>{resultHealth.status}</p>
+              <h4 className="text-lg mt-2 text-blue-700 font-medium">
+                Notes:
+              </h4>
+              <p className="text-gray-700">{resultHealth.notes}</p>
+            </div>
+          )}
         </div>
       </div>
-
       <Footer />
     </>
   );
