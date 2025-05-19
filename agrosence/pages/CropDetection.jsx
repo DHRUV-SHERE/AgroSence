@@ -23,7 +23,7 @@ function CropDetection() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "api/crop-detect",
+        "https://agrosence-1.onrender.com/api/crop-detect",
         formData,
         {
           headers: {
