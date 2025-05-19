@@ -56,7 +56,7 @@ router.post("/crop-detect", upload.single("image"), async (req, res) => {
 
     const scientificName = plant.plant_name;
     const commonNames = plant.plant_details?.common_names || [];
-    const description = plant.plant_details?.wiki_description?.value 
+    const description = plant.plant_details?.wiki_description?.value
       || await getWikiDescription(scientificName);
 
     res.json({
@@ -79,7 +79,6 @@ router.post("/crop-health", upload.single("image"), async (req, res) => {
     const healthResponse = await axios.post("https://api.plant.id/v2/health_assessment", {
       api_key: process.env.PLANT_ID_HEALTH_API_KEY,
       images: [imageUrl],
-      // modifiers can include ["crops_fast", "similar_images"] if needed
       plant_language: "en",
       disease_details: ["description"],
     });
@@ -91,7 +90,7 @@ router.post("/crop-health", upload.single("image"), async (req, res) => {
     let notes = isHealthy
       ? "No visible disease detected."
       : suggestions?.map((d) => `${d.name}: ${d.disease_details?.description}`).join("\n") ||
-        "Possible disease detected, but no description found.";
+      "Possible disease detected, but no description found.";
 
     res.json({
       image: imageUrl,
@@ -99,9 +98,12 @@ router.post("/crop-health", upload.single("image"), async (req, res) => {
       notes,
     });
   } catch (err) {
-    console.error("Health API Error:", err.response?.data || err.message);
-    res.status(500).json({ error: "Health detection failed." });
-  }
+  console.error("Health API Error:", err.response?.data || err.message, err.response?.status);
+ res.status(500).json({ 
+  error: "Health detection failed.", 
+  debug: err.response?.data || err.message 
+});
+}
 });
 
 module.exports = router;
