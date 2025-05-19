@@ -25,6 +25,7 @@ import Reports from "../pages/FarmingReport"
 import QuickSupport from "../pages/QuickSupport"
 import FarmingRoutine from "../pages/FarmingRoutine"
 import LiveCropPricing from "../pages/LiveCropPricing";
+import CropDetection from "../pages/CropDetection";
 // Function to check if user is authenticated
 const isAuthenticated = () => {
   return localStorage.getItem("authToken") !== null; // Check if auth token exists
@@ -63,6 +64,7 @@ const AppContent = () => {
         <Route path="/features/MarketAccess" element={<ProtectedRoute element={<MarketAccess />} />} />
         <Route path="/features/MarketAccess/product/:id" element={<ProtectedRoute element={<CropDetail />} />} />
         <Route path="/features/expert" element={<ProtectedRoute element={<AgroExpert />} />} />
+        <Route path="/features/crop-detection" element={<ProtectedRoute element={<CropDetection />} />} />
         <Route path="/features/resources" element={<ProtectedRoute element={<ResourcesPage />} />} />
         <Route path="/features/resources/:_id" element={<ProtectedRoute element={<ResourceDetail />} />} />
         <Route path="/state-schemes/:stateName" element={<ProtectedRoute element={<StateSchemes />} />} />
