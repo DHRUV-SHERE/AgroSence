@@ -15,6 +15,7 @@ const notificationRoutes = require("./src/routes/notificationRoutes");
 const orderRoutes = require("./src/routes/orderRoutes"); 
 const supportRoutes = require("./src/routes/supportRoutes");
 const cropDetectRoute = require("./src/routes/cropDetectRoutes")
+const cropHealthRoute = require("./src/routes/cropHealthRoutes")
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -36,7 +37,8 @@ app.use("/api/schemes", schemeRoutes);
 app.use("/api/agriculture", agricultureRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api", cropDetectRoute);
+app.use("/api/crop-detect", cropDetectRoute);
+app.use("/api/crop-health", cropHealthRoute);
 app.use("/api/support", supportRoutes);
 
 // Chatbot route
