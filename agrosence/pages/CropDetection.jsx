@@ -50,7 +50,7 @@ function CropDetection() {
 
     setLoadingHealth(true)
     try {
-      const response = await axios.post("https://agrosence-1.onrender.com/api/crophealth", formData, {
+      const response = await axios.post("https://agrosence-1.onrender.com/api/crop-health", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       setResultHealth(response.data)

@@ -38,7 +38,7 @@ app.use("/api/agriculture", agricultureRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/crop-detect", cropDetectRoute);
-app.use("/api/crophealth", cropHealthRoute);
+app.use("/api/crop-health", cropHealthRoute);
 app.use("/api/support", supportRoutes);
 
 // Chatbot route
