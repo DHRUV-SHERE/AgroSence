@@ -33,6 +33,7 @@ router.post("/", upload.single("image"), async (req, res) => {
   try {
     const imageUrl = req.file.path;
     console.log("Image URL sent to Kindwise:", imageUrl);
+    console.log("Using API Key:", process.env.PLANT_ID_HEALTH_API_KEY);
 
     const response = await axios.post(
       "https://crop.kindwise.com/api/v1/identification",
@@ -48,7 +49,6 @@ router.post("/", upload.single("image"), async (req, res) => {
         },
       }
     );
-
     const diseases = response.data?.result?.diseases || [];
     const isHealthy = diseases.length === 0;
 
@@ -56,11 +56,11 @@ router.post("/", upload.single("image"), async (req, res) => {
     const notes = isHealthy
       ? "No visible disease detected."
       : diseases
-          .map(
-            (d) =>
-              `${d.name}: ${d.details?.description || "No description available."}`
-          )
-          .join("\n");
+        .map(
+          (d) =>
+            `${d.name}: ${d.details?.description || "No description available."}`
+        )
+        .join("\n");
 
     res.status(200).json({
       image: imageUrl,
@@ -68,7 +68,13 @@ router.post("/", upload.single("image"), async (req, res) => {
       notes,
     });
   } catch (err) {
-    console.error("Health API Error:", err.response?.data || err.message);
+    console.error("Health API Error:");
+    if (err.response) {
+      console.error("Response Data:", err.response.data);
+      console.error("Status Code:", err.response.status);
+    } else {
+      console.error("Message:", err.message);
+    }
     res.status(500).json({
       error: "Health detection failed.",
       debug: err.response?.data || err.message,

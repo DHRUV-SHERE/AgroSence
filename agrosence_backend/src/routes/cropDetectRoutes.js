@@ -46,7 +46,7 @@ router.post("/", upload.single("image"), async (req, res) => {
     const imageUrl = req.file.path;
 
     const plantResponse = await axios.post("https://api.plant.id/v2/identify", {
-      api_key: process.env.PLANT_ID_API_KEY,
+      api_key: process.env.PLANT_ID_IDENTIFICATION_API_KEY,
       images: [imageUrl],
       modifiers: ["crops_fast", "similar_images"],
       plant_language: "en",
