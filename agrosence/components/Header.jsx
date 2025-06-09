@@ -10,6 +10,13 @@ function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
+  const navLinks = {
+    Home: "/",
+    Feature: "/Feature",
+    Dashboard: "/dashboard",
+    "Contact Us": "/ContactUs",
+    About: "/About",
+  };
   const handleSearch = (e) => {
     e.preventDefault();
     const query = searchQuery.toLowerCase();
@@ -77,21 +84,20 @@ function Header() {
           </button>
 
           {/* Navigation Links */}
+
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mx-auto gap-3">
-              {["Home", "Feature", "Dashboard", "Contact Us", "About"].map(
-                (item) => (
-                  <li className="nav-item fs-5" key={item}>
-                    <a
-                      className="nav-link position-relative text-light"
-                      href={`/${item.replace(/\s+/g, "")}`}
-                      style={{ textTransform: "capitalize" }}
-                    >
-                      {item}
-                    </a>
-                  </li>
-                )
-              )}
+              {Object.entries(navLinks).map(([label, path]) => (
+                <li className="nav-item fs-5" key={label}>
+                  <a
+                    className="nav-link position-relative text-light"
+                    href={path}
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
 
             {/* Search Bar and User Profile */}
