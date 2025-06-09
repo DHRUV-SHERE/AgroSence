@@ -34,22 +34,40 @@ const Sidebar = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userId");
+    window.location.href = "/"; // OR use useNavigate if preferred
+  };
+
   const menuItems = [
     { to: "/Dashboard", icon: <BsGrid1X2Fill />, label: "Dashboard" },
     { to: "/CropSell", icon: <BsBarChart />, label: "Crop Sell" },
     { to: "/OrderHistory", icon: <BsClock />, label: "User History" },
-    { to: "/LiveCropPricing", icon: <IoIosPricetags />, label: "Live Crop Pricing" },
-    { to: "/Reports", icon: <BsFileText />, label: "Farming Report / Requests" },
+    {
+      to: "/LiveCropPricing",
+      icon: <IoIosPricetags />,
+      label: "Live Crop Pricing",
+    },
+    {
+      to: "/Reports",
+      icon: <BsFileText />,
+      label: "Farming Report / Requests",
+    },
     { to: "/Routine", icon: <BsBox />, label: "Farming Routine" },
-    { to: "/QuickSupport", icon: <BsLifePreserver />, label: "Quick Support / Feedback" },
+    {
+      to: "/QuickSupport",
+      icon: <BsLifePreserver />,
+      label: "Quick Support / Feedback",
+    },
   ];
 
   const extraLinks = [
-    { to: "/Home", icon: <BsHouseFill />, label: "Home" },
+    { to: "/", icon: <BsHouseFill />, label: "Home" },
     { to: "/Feature", icon: <BsTools />, label: "Features" },
     { to: "/ContactUs", icon: <BsPhoneFill />, label: "Contact" },
     { to: "/Setting", icon: <BsGearFill />, label: "Settings" },
-    { to: "/", icon: <BsBoxArrowRight />, label: "Logout" },
+    { to: "/", icon: <BsBoxArrowRight />, label: "Logout", isLogout: true },
   ];
 
   return (
@@ -68,10 +86,15 @@ const Sidebar = () => {
         style={{ width: "250px", zIndex: 1045 }}
       >
         <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
-          <h3 className="m-0" style={{ fontFamily: "martel" }}>AgroSence</h3>
+          <h3 className="m-0" style={{ fontFamily: "martel" }}>
+            AgroSence
+          </h3>
         </div>
 
-        <div className="p-3 sidebar-content overflow-auto" style={{ height: "calc(100vh - 71px)" }}>
+        <div
+          className="p-3 sidebar-content overflow-auto"
+          style={{ height: "calc(100vh - 71px)" }}
+        >
           {menuItems.map((item, idx) => (
             <div className="mb-2" key={idx}>
               <Link to={item.to} className={linkClass(item.to)}>
@@ -82,13 +105,26 @@ const Sidebar = () => {
           ))}
 
           <div className="border-top pt-4">
-            <small className="text-muted px-2 fw-bold">Access Other Features</small>
+            <small className="text-muted px-2 fw-bold">
+              Access Other Features
+            </small>
             {extraLinks.map((item, idx) => (
               <div className="mt-2" key={idx}>
-                <Link to={item.to} className={linkClass(item.to)}>
-                  {item.icon}
-                  <span className="ms-3">{item.label}</span>
-                </Link>
+                {item.isLogout ? (
+                  <button
+                    onClick={handleLogout}
+                    className="d-flex align-items-center text-secondary p-2 rounded border-0 bg-transparent w-100"
+                    style={{ textAlign: "left" }}
+                  >
+                    {item.icon}
+                    <span className="ms-3">{item.label}</span>
+                  </button>
+                ) : (
+                  <Link to={item.to} className={linkClass(item.to)}>
+                    {item.icon}
+                    <span className="ms-3">{item.label}</span>
+                  </Link>
+                )}
               </div>
             ))}
           </div>
@@ -97,12 +133,17 @@ const Sidebar = () => {
 
       {/* Mobile Sidebar */}
       <div
-        className={`sidebar bg-white border-end position-fixed start-0 top-0 h-100 d-lg-none ${mobileOpen ? "" : "d-none"}`}
+        className={`sidebar bg-white border-end position-fixed start-0 top-0 h-100 d-lg-none ${
+          mobileOpen ? "" : "d-none"
+        }`}
         style={{ width: "250px", zIndex: 1050 }}
       >
         <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
           <h3 className="m-0">AgroSence</h3>
-          <button className="btn btn-link p-0 text-dark" onClick={toggleSidebar}>
+          <button
+            className="btn btn-link p-0 text-dark"
+            onClick={toggleSidebar}
+          >
             <BsX size={24} />
           </button>
         </div>
@@ -138,10 +179,17 @@ const Sidebar = () => {
           </div>
         </div>
 
-        <div className="p-3 sidebar-content overflow-auto" style={{ height: "calc(100vh - 71px)" }}>
+        <div
+          className="p-3 sidebar-content overflow-auto"
+          style={{ height: "calc(100vh - 71px)" }}
+        >
           {menuItems.map((item, idx) => (
             <div className="mb-2" key={idx}>
-              <Link to={item.to} className={linkClass(item.to)} onClick={toggleSidebar}>
+              <Link
+                to={item.to}
+                className={linkClass(item.to)}
+                onClick={toggleSidebar}
+              >
                 {item.icon}
                 <span className="ms-3">{item.label}</span>
               </Link>
@@ -149,13 +197,33 @@ const Sidebar = () => {
           ))}
 
           <div className="border-top pt-4">
-            <small className="text-muted px-2 fw-bold">Access Other Features</small>
+            <small className="text-muted px-2 fw-bold">
+              Access Other Features
+            </small>
             {extraLinks.map((item, idx) => (
               <div className="mt-2" key={idx}>
-                <Link to={item.to} className={linkClass(item.to)} onClick={toggleSidebar}>
-                  {item.icon}
-                  <span className="ms-3">{item.label}</span>
-                </Link>
+                {item.isLogout ? (
+                  <button
+                    onClick={() => {
+                      toggleSidebar();
+                      handleLogout();
+                    }}
+                    className="d-flex align-items-center text-secondary p-2 rounded border-0 bg-transparent w-100"
+                    style={{ textAlign: "left" }}
+                  >
+                    {item.icon}
+                    <span className="ms-3">{item.label}</span>
+                  </button>
+                ) : (
+                  <Link
+                    to={item.to}
+                    className={linkClass(item.to)}
+                    onClick={toggleSidebar}
+                  >
+                    {item.icon}
+                    <span className="ms-3">{item.label}</span>
+                  </Link>
+                )}
               </div>
             ))}
           </div>

@@ -14,12 +14,14 @@ function Header() {
     e.preventDefault();
     const query = searchQuery.toLowerCase();
 
-    if (query.includes("home")) navigate("/Home");
+    if (query.includes("home")) navigate("/");
     else if (query.includes("about")) navigate("/About");
     else if (query.includes("contact")) navigate("/ContactUs");
-    else if (query.includes("feature") || query.includes("features")) navigate("/Feature");
+    else if (query.includes("feature") || query.includes("features"))
+      navigate("/Feature");
     else if (query.includes("dashboard")) navigate("/dashboard");
-    else if (query.includes("government")) navigate("/features/government-schemes");
+    else if (query.includes("government"))
+      navigate("/features/government-schemes");
     else if (query.includes("market")) navigate("/features/MarketAccess");
     else if (query.includes("expert")) navigate("/features/expert");
     else if (query.includes("resource")) navigate("/features/resources");
@@ -49,7 +51,7 @@ function Header() {
       >
         <div className="container-fluid px-4">
           {/* Logo Section */}
-          <a className="navbar-brand d-flex align-items-center p-1" href="/Home">
+          <a className="navbar-brand d-flex align-items-center p-1" href="/">
             <img
               src={resource.Logo2.src}
               alt={resource.Logo2.alt}
@@ -77,30 +79,52 @@ function Header() {
           {/* Navigation Links */}
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mx-auto gap-3">
-              {["Home", "Feature", "Dashboard", "Contact Us", "About"].map((item) => (
-                <li className="nav-item fs-5" key={item}>
-                  <a
-                    className="nav-link position-relative text-light"
-                    href={`/${item.replace(/\s+/g, "")}`}
-                    style={{ textTransform: "capitalize" }}
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
+              {["Home", "Feature", "Dashboard", "Contact Us", "About"].map(
+                (item) => (
+                  <li className="nav-item fs-5" key={item}>
+                    <a
+                      className="nav-link position-relative text-light"
+                      href={`/${item.replace(/\s+/g, "")}`}
+                      style={{ textTransform: "capitalize" }}
+                    >
+                      {item}
+                    </a>
+                  </li>
+                )
+              )}
             </ul>
 
             {/* Search Bar and User Profile */}
             <div className="d-flex align-items-center">
               {/* User Profile Icon */}
-              <FaUserCircle
-                className="me-3 rounded-circle"
-                style={{ fontSize: "2.5rem", cursor: "pointer" }}
-                onClick={() => setShowProfile(true)}
-              />
+              {localStorage.getItem("authToken") ? (
+                <FaUserCircle
+                  className="me-3 rounded-circle"
+                  style={{ fontSize: "2.5rem", cursor: "pointer" }}
+                  onClick={() => setShowProfile(true)}
+                />
+              ) : (
+                <>
+                  <button
+                    className="btn btn-outline-light me-2"
+                    onClick={() => navigate("/Login")}
+                  >
+                    Login
+                  </button>
+                  <button
+                    className="btn btn-light text-dark"
+                    onClick={() => navigate("/Signup")}
+                  >
+                    Signup
+                  </button>
+                </>
+              )}
 
               {/* Search Bar */}
-              <form className="d-flex align-items-center" onSubmit={handleSearch}>
+              <form
+                className="d-flex m-lg-1 align-items-center"
+                onSubmit={handleSearch}
+              >
                 <div className="input-group" style={{ width: "250px" }}>
                   <span
                     className="input-group-text text-muted fs-5"
