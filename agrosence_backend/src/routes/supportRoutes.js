@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
 
     let mailOptions = {
       from: email,
-      to: "projectagrosence2024@gmail.com",
+      to: "info.hexcodebreaker@gmail.com",
       subject: "New Support Request",
       text: `From: ${name} (${email})\n\n${message}`,
     };

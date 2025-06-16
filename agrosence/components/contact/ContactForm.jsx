@@ -175,10 +175,10 @@ const ContactForm = () => {
               <strong>Email:</strong>
               <br />
               <a
-                href="mailto:projectagrosence2024@gmail.com"
+                href="mailto:info.hexcodebreaker@gmail.com"
                 className="text-decoration-none"
               >
-                projectagrosence2024@gmail.com <br />
+                info.hexcodebreaker@gmail.com <br />
                 {/* sheredhruv@gmail.com <br />
                 herin7151@gmail.com <br />
                 janijeet50@gmail.com <br /> */}

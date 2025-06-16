@@ -45,7 +45,7 @@ const Footer = () => {
           {/* Contact Info */}
           <div className="col-md-3 mb-4">
             <h6 className="fw-bold">Contact Us</h6>
-            <p>Email: projectagrosence2024@gmail.com</p>
+            <p>Email: info.hexcodebreaker@gmail.com</p>
             <p>Phone: +91 98765 43210</p>
             <p>Address: Ganpat University, Gujarat, India</p>
           </div>
