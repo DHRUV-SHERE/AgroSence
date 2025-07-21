@@ -65,7 +65,7 @@ function Header() {
               className="rounded-circle me-2"
               style={{ width: "50px", height: "auto" }}
             />
-            <h4 className="logoname mb-0 text-light">
+            <h4 className="logoname mb-0 text-success">
               <b>AgroSense</b>
             </h4>
           </a>
@@ -90,7 +90,7 @@ function Header() {
               {Object.entries(navLinks).map(([label, path]) => (
                 <li className="nav-item fs-5" key={label}>
                   <a
-                    className="nav-link position-relative text-light"
+                    className="nav-link position-relative text-success"
                     href={path}
                     style={{ textTransform: "capitalize" }}
                   >
@@ -112,7 +112,7 @@ function Header() {
               ) : (
                 <>
                   <button
-                    className="btn btn-outline-light me-2"
+                    className="btn btn-outline-succes me-2"
                     onClick={() => navigate("/Login")}
                   >
                     Login
