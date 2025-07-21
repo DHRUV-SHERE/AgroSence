@@ -7,7 +7,7 @@ import HomeHeader from "../components/home/HomeHeader"; // Ensure the path is co
 
 function Home() {
   return (
-    <div className="w-100" style={{ backgroundColor: "#35a750" }}>
+    <div className="w-100">
       {/* Header at the top */}
       <Header />
 
