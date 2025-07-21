@@ -47,11 +47,11 @@ function Header() {
   return (
     <>
       <nav
-        className="navbar navbar-expand-md shadow-sm text-light w-100 fixed-top"
+        className="navbar navbar-expand-md shadow-sm text-success w-100 fixed-top"
         style={{
           overflowX: "hidden",
           position: "static",
-          backgroundColor: "#252525",
+          backgroundColor: "transparent",
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
         }}
