@@ -50,8 +50,8 @@ function Header() {
         className="navbar navbar-expand-md shadow-sm text-success w-100 fixed-top"
         style={{
           overflowX: "hidden",
-          position: "sticky",
-          backgroundColor: "transparent",
+          position: "static",
+          backgroundColor: "white",
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
         }}
