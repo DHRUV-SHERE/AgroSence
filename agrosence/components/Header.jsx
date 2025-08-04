@@ -60,8 +60,8 @@ function Header() {
           {/* Logo Section */}
           <a className="navbar-brand d-flex align-items-center p-1" href="/">
             <img
-              src={resource.Logo2.src}
-              alt={resource.Logo2.alt}
+              src={resource.Logo3.src}
+              alt={resource.Logo3.alt}
               className="rounded-circle me-2"
               style={{ width: "50px", height: "auto" }}
             />
