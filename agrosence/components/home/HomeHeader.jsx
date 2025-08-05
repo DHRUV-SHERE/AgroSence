@@ -1,32 +1,25 @@
-import { useEffect } from "react";
-import { motion, useAnimation } from "framer-motion";
+import { motion } from "framer-motion";
 import { resource } from "../../resource";
 
-const textArray = [
-  "Welcome to the World of Agriculture",
-  "Modern Farming Techniques",
-  "Smart Agriculture Solutions",
-  "Sustainable Farming Practices",
-  "Empowering Farmers with Technology",
-];
+const combinedText = "Welcome to the world of modern, smart, and sustainable agriculture empowering farmers with technology.";
+
+const words = combinedText.split(" ");
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const wordVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const HomeHero = () => {
-  const controls = useAnimation();
-
-  useEffect(() => {
-    const sequence = async () => {
-      while (true) {
-        for (const text of textArray) {
-          await controls.start({
-            opacity: [0, 1, 1, 0],
-            transition: { duration: 4, times: [0, 0.2, 0.8, 1] },
-          });
-        }
-      }
-    };
-    sequence();
-  }, [controls]);
-
   return (
     <div
       className="d-flex align-items-center justify-content-center text-white text-center position-relative"
@@ -35,21 +28,31 @@ const HomeHero = () => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        height: "80vh",
+        height: "100vh",
       }}
     >
-      <motion.h1
-        key="hero-text"
-        animate={controls}
-        className="display-4 fw-bold px-3 position-relative"
-        style={{ zIndex: 2 }}
-      >
-        {textArray[0]} {/* Initial text (won’t matter due to animation loop) */}
-      </motion.h1>
       <div
         className="overlay position-absolute top-0 start-0 w-100 h-100"
         style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1 }}
       />
+      
+      <motion.div
+        className="display-4 fw-bold px-4 position-relative"
+        style={{ zIndex: 2 }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {words.map((word, index) => (
+          <motion.span
+            key={index}
+            variants={wordVariants}
+            className="d-inline-block mx-1"
+          >
+            {word}
+          </motion.span>
+        ))}
+      </motion.div>
     </div>
   );
 };

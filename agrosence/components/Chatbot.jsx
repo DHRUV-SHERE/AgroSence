@@ -105,7 +105,7 @@ const Chatbot = () => {
               >
                 {chat.sender === "bot" && (
                   <img
-                    src={resource.Logo3.src}
+                    src={resource.Chatbot1.src}
                     alt={resource.Chatbot.alt}
                     className="chatbox-image border border-2 border-success"
                   />
