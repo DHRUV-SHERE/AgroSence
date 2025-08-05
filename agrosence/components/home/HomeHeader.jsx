@@ -1,94 +1,56 @@
+import { useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 import { resource } from "../../resource";
-import { Carousel } from "react-bootstrap";
+
+const textArray = [
+  "Welcome to the World of Agriculture",
+  "Modern Farming Techniques",
+  "Smart Agriculture Solutions",
+  "Sustainable Farming Practices",
+  "Empowering Farmers with Technology",
+];
 
 const HomeHero = () => {
+  const controls = useAnimation();
+
+  useEffect(() => {
+    const sequence = async () => {
+      while (true) {
+        for (const text of textArray) {
+          await controls.start({
+            opacity: [0, 1, 1, 0],
+            transition: { duration: 4, times: [0, 0.2, 0.8, 1] },
+          });
+        }
+      }
+    };
+    sequence();
+  }, [controls]);
+
   return (
-    <Carousel className="hero-carousel" interval={2000} pause={false}> 
-      <Carousel.Item>
-        <div
-          className="d-flex align-items-center justify-content-center hero-section position-relative text-white text-center py-5"
-          style={{
-            backgroundImage: `url(${resource.s3.src})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            height: "550px",
-          }}
-        >
-          <h1 className="text-white position-relative m-auto px-3 display-5 fw-bold" style={{ zIndex: 2 }}>
-            Welcome to the World of Agriculture
-          </h1>
-        </div>
-      </Carousel.Item>
-
-      <Carousel.Item>
-        <div
-          className="d-flex align-items-center justify-content-center hero-section position-relative text-white text-center py-5"
-          style={{
-            backgroundImage: `url(${resource.s2.src})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            height: "550px",
-          }}
-        >
-          <h1 className="text-white position-relative m-auto px-3 display-5 fw-bold" style={{ zIndex: 2 }}>
-            Modern Farming Techniques
-          </h1>
-        </div>
-      </Carousel.Item>
-
-      <Carousel.Item>
-        <div
-          className="d-flex align-items-center justify-content-center hero-section position-relative text-white text-center py-5"
-          style={{
-            backgroundImage: `url(${resource.s3.src})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            height: "550px",
-          }}
-        >
-          <h1 className="text-white position-relative m-auto px-3 display-5 fw-bold" style={{ zIndex: 2 }}>
-            Smart Agriculture Solutions
-          </h1>
-        </div>
-      </Carousel.Item>
-
-      <Carousel.Item>
-        <div
-          className="d-flex align-items-center justify-content-center hero-section position-relative text-white text-center py-5"
-          style={{
-            backgroundImage: `url(${resource.s4.src})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            height: "550px",
-          }}
-        >
-          <h1 className="text-white position-relative m-auto px-3 display-5 fw-bold" style={{ zIndex: 2 }}>
-            Sustainable Farming Practices
-          </h1>
-        </div>
-      </Carousel.Item>
-
-      <Carousel.Item>
-        <div
-          className="d-flex align-items-center justify-content-center hero-section position-relative text-white text-center py-5"
-          style={{
-            backgroundImage: `url(${resource.s2.src})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            height: "550px",
-          }}
-        >
-          <h1 className="text-white position-relative m-auto px-3 display-5 fw-bold" style={{ zIndex: 2 }}>
-            Empowering Farmers with Technology
-          </h1>
-        </div>
-      </Carousel.Item>
-    </Carousel>
+    <div
+      className="d-flex align-items-center justify-content-center text-white text-center position-relative"
+      style={{
+        backgroundImage: `url(${resource.s2.src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        height: "80vh",
+      }}
+    >
+      <motion.h1
+        key="hero-text"
+        animate={controls}
+        className="display-4 fw-bold px-3 position-relative"
+        style={{ zIndex: 2 }}
+      >
+        {textArray[0]} {/* Initial text (won’t matter due to animation loop) */}
+      </motion.h1>
+      <div
+        className="overlay position-absolute top-0 start-0 w-100 h-100"
+        style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1 }}
+      />
+    </div>
   );
 };
 
