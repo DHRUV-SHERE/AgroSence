@@ -33,7 +33,7 @@ const HomeHero = () => {
     > 
       <motion.div
         className="display-4 fw-bold px-4 position-relative"
-        style={{ zIndex: 2 }}
+        style={{ zIndex: 0 }}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
