@@ -22,13 +22,13 @@ const wordVariants = {
 const HomeHero = () => {
   return (
     <div
-      className="d-flex align-items-center justify-content-center text-white text-center position-relative"
+      className="d-flex align-items-center justify-content-center text-white text-center position-absolute w-100 h-100"
       style={{
         backgroundImage: `url(${resource.s2.src})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        height: "100vh",
+        height: "90vh",
       }}
     >
       <div
