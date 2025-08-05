@@ -22,7 +22,7 @@ const wordVariants = {
 const HomeHero = () => {
   return (
     <div
-      className="d-flex align-items-center justify-content-center text-white text-center position-absolute w-100 h-100"
+      className="d-flex align-items-center justify-content-center text-white text-center position-relative"
       style={{
         backgroundImage: `url(${resource.s2.src})`,
         backgroundSize: "cover",
@@ -30,12 +30,7 @@ const HomeHero = () => {
         backgroundRepeat: "no-repeat",
         height: "90vh",
       }}
-    >
-      <div
-        className="overlay position-absolute top-0 start-0 w-100 h-100"
-        style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1 }}
-      />
-      
+    > 
       <motion.div
         className="display-4 fw-bold px-4 position-relative"
         style={{ zIndex: 2 }}
