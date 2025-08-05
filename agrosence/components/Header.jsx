@@ -66,7 +66,7 @@ function Header() {
               style={{ width: "50px", height: "auto" }}
             />
             <h4 className="logoname mb-0 text-success">
-              <b>AgroSense</b>
+              <b>AgroSence</b>
             </h4>
           </a>
 
