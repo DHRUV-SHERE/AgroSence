@@ -56,7 +56,7 @@
 .ag-formgrid { display: grid; gap: var(--s-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .ag-formgrid > .ag-span { grid-column: 1 / -1; }
 @media (max-width: 40rem) { .ag-formgrid { grid-template-columns: 1fr; } }
-.ag-sellwrap { max-width: 46rem; }
+.ag-sellwrap { max-width: 64rem; }
 .ag-form-actions { display: flex; gap: var(--s-3); flex-wrap: wrap; justify-content: flex-end; margin-top: var(--s-5); }
 .ag-pickimg { display: grid; gap: var(--s-3); }
 .ag-pickimg__drop { position: relative; display: grid; justify-items: center; gap: var(--s-1); padding: var(--s-5); text-align: center; border: 2px dashed var(--line-strong); border-radius: var(--r-lg); background: var(--surface-2); cursor: pointer; color: var(--ink-2); transition: border-color var(--dur-2) ease, background var(--dur-2) ease; }

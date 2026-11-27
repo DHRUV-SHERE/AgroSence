@@ -26,7 +26,7 @@ function Gallery({ images, name }) {
   const current = list[Math.min(i, list.length - 1)]
   return (
     <div className="ag-gallery">
-      <img className="ag-gallery__main" src={imageUrl(current, { width: 900 })} srcSet={srcSet(current, [480, 720, 1080])} sizes="(max-width: 52rem) 100vw, 40rem" width="900" height="675" alt={`${name}, photo ${i + 1} of ${list.length}`} decoding="async" />
+      <img className="ag-gallery__main" src={imageUrl(current, { width: 900 })} srcSet={srcSet(current, [480, 720, 1080])} sizes="(max-width: 52rem) 100vw, 50vw" width="900" height="675" alt={`${name}, photo ${i + 1} of ${list.length}`} decoding="async" fetchPriority="high" />
       {list.length > 1 && (
         <div className="ag-gallery__thumbs" role="group" aria-label="Crop photos">
           {list.map((src, idx) => (

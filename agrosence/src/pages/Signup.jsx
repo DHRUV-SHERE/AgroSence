@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { INDIAN_STATES, LANGUAGES, rules, validate } from '../lib/validate'
 import { Alert, Button, Input, PasswordInput, Select, Textarea, useToast } from '../components/ui'
 import AuthShell from '../components/AuthShell'
-import art from '../assets/Register.webp'
+import art from '../assets/auth-register.webp'
 
 const STEPS = [
   { title: 'About you', fields: ['name', 'mobile', 'email'] },

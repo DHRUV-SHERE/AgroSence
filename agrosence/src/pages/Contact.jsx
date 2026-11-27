@@ -62,6 +62,7 @@ export default function Contact() {
       <section className="ag-section">
         <div className="ag-container ag-contact">
           <div>
+            <h2 className="ag-sr-only">Send us a message</h2>
             {sent ? (
               <div className="ag-success" role="status">
                 <LuCircleCheck aria-hidden="true" />
@@ -87,6 +88,7 @@ export default function Contact() {
           </div>
 
           <aside className="ag-contact__info" aria-label="Contact details">
+            <h2 className="ag-sr-only">Email, phone and office</h2>
             <dl>
               <div><dt>Office</dt><dd>{CONTACT.address}</dd></div>
               <div><dt>Phone</dt>{CONTACT.phones.map((p) => <dd key={p.value}><a href={`tel:${p.value.replace(/\s/g, '')}`}>{p.value}</a> <span className="ag-muted">({p.label})</span></dd>)}</div>

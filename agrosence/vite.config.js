@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2020',
       cssCodeSplit: true,
+      manifest: true, // scripts/prerender.mjs reads it to preload each prerendered page's chunk
       sourcemap: false,
       chunkSizeWarningLimit: 600,
       rollupOptions: {

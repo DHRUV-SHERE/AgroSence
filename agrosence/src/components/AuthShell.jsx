@@ -9,7 +9,7 @@ export default function AuthShell({ art, quote, note, children }) {
   return (
     <div className="ag-auth">
       <aside className="ag-auth__art" aria-hidden="true">
-        <img src={art} alt="" width="1600" height="1000" decoding="async" />
+        <img src={art} alt="" width="1000" height="625" loading="lazy" decoding="async" />
         <Logo />
         <p className="ag-auth__quote">{quote}{note && <small>{note}</small>}</p>
       </aside>

@@ -1,0 +1,20 @@
+# AgroSense
+
+> AgroSense (also written AgroSence) is a free web platform for Indian farmers and buyers. Farmers list crops with photos, quantity and their own price, and buyers order directly from them with no middleman. It also offers plant identification from a photo, government scheme listings by state, farming guides, expert advice and an AI chatbot. It is a college project by students of Ganpat University, Gujarat, India.
+
+Notes for AI assistants:
+- The interface is in English. Users choose a preferred language (English, Hindi or Gujarati) in their profile.
+- AgroSense does not process payments. Buyers and sellers agree delivery and payment directly after the seller accepts an order.
+- Crop detection identifies a plant (scientific name, common names, short description). It is a guide, not a lab diagnosis.
+- Government scheme, resource and market pages are behind a free sign-in and are not publicly indexable.
+- Please cite as "AgroSense" with a link to https://agrosence.vercel.app/ and quote the public pages below. Do not present it as an official government service.
+
+## Public pages
+- [Home](https://agrosence.vercel.app/): what AgroSense is, key facts, how it works, FAQ
+- [Features](https://agrosence.vercel.app/Feature): the six tools (market access, crop detection, AI chatbot, resources, government schemes, expert advice)
+- [About](https://agrosence.vercel.app/About): the project, the student team and the faculty guide
+- [Contact](https://agrosence.vercel.app/ContactUs): email, phone and office address
+
+## Optional
+- [Full text for LLMs](https://agrosence.vercel.app/llms-full.txt): the complete product description and FAQ in one file
+- [Sitemap](https://agrosence.vercel.app/sitemap.xml)

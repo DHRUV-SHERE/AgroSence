@@ -1,6 +1,8 @@
 /** About: vision, team, guide. Layout: PublicLayout. */
+import { Link } from 'react-router-dom'
 import { LuGithub, LuLinkedin } from 'react-icons/lu'
 import { IconButton } from '../components/ui'
+import { CONTENT_UPDATED } from '../seo/site'
 
 const TEAM = [
   { name: 'Dhruv Shere', bio: 'Sets the vision for AgroSense and shapes the product end to end, from the farmer’s first question to the final sale.', github: 'https://github.com/DHRUV-SHERE', linkedin: 'https://www.linkedin.com/in/dhruv-shere/' },
@@ -25,7 +27,7 @@ export default function About() {
       <section className="ag-pagehero">
         <div className="ag-container">
           <h1>A fairer way to sell what you grow</h1>
-          <p>AgroSense is a college project from Ganpat University with a simple aim: put farmers in direct contact with buyers and give them the knowledge to farm better.</p>
+          <p>AgroSense (also written AgroSence) is a free web platform built as a college project at U.V. Patel College of Engineering, Ganpat University, Gujarat. Its aim is simple: put farmers in direct contact with buyers and give them the knowledge to farm better.</p>
         </div>
       </section>
 
@@ -58,6 +60,16 @@ export default function About() {
         </div>
       </section>
 
+      <section className="ag-section" aria-labelledby="langs-h">
+        <div className="ag-container ag-narrow" style={{ marginInline: 'auto' }}>
+          <h2 id="langs-h">AgroSense in Hindi and Gujarati</h2>
+          <div className="ag-prose ag-stack">
+            <p lang="hi">AgroSense किसानों को सीधे खरीदारों से जोड़ने वाला एक मुफ़्त वेब प्लेटफ़ॉर्म है। किसान अपनी फसल की तस्वीर, मात्रा और अपनी कीमत के साथ सूची बनाते हैं, और खरीदार सीधे उनसे ऑर्डर करते हैं।</p>
+            <p lang="gu">AgroSense ખેડૂતોને સીધા ખરીદદારો સાથે જોડતું મફત વેબ પ્લેટફોર્મ છે. ખેડૂતો પોતાના પાકના ફોટા, જથ્થો અને પોતાની કિંમત સાથે યાદી બનાવે છે, અને ખરીદદારો સીધા તેમની પાસેથી ઓર્ડર કરે છે.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="ag-section" aria-labelledby="guide-h">
         <div className="ag-container">
           <h2 id="guide-h" style={{ marginBottom: 'var(--s-6)' }}>Our guide</h2>
@@ -68,6 +80,7 @@ export default function About() {
               <p>We are deeply grateful to our guide for his constant support and invaluable direction throughout this project. His humble and respectful nature made it easy for us to approach him with any challenge. His insightful suggestions and problem-solving approach helped us overcome obstacles and grow, both technically and personally. His dedication to sharing new knowledge and encouraging creativity has been a source of motivation for the whole team. We truly appreciate his mentorship and are honoured to have him as our guide.</p>
             </div>
           </div>
+          <p className="ag-updated">Last updated <time dateTime={CONTENT_UPDATED}>{CONTENT_UPDATED}</time>. See what the platform offers on the <Link to="/Feature">features page</Link>, or <Link to="/ContactUs">contact the team</Link>.</p>
         </div>
       </section>
     </>

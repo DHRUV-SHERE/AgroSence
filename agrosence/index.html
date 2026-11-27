@@ -4,28 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="google-site-verification" content="aYtFVlLJqE0S0YVKfb1wJN8dn-G-CMrd-5dlrNsT7Q4" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F7F1E3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#17120D" media="(prefers-color-scheme: dark)" />
-    <title>AgroSense | Sell your harvest directly to buyers</title>
-    <meta
-      name="description"
-      content="AgroSense connects farmers directly with buyers. List crops, detect crop problems with AI, follow government schemes, and get expert advice in English, Hindi and Gujarati."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="AgroSense" />
-    <meta property="og:title" content="AgroSense | Sell your harvest directly to buyers" />
-    <meta property="og:description" content="List crops, find buyers, detect crop problems with AI and follow government schemes. Built for Indian farmers." />
-    <meta property="og:image" content="/og-image.jpg" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <!-- seo:start (replaced per route at build time by scripts/prerender.mjs; Seo.jsx keeps it current while browsing) -->
+    <title>AgroSense: Sell Crops Directly to Buyers in India</title>
+    <meta name="description" content="AgroSense lets Indian farmers list crops, set their own price and sell directly to buyers." />
+    <!-- seo:end -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable site summary" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
+
+    <link rel="preload" href="/fonts/inter-latin-wght-v1.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Wake the (free-tier) API while the page loads: preconnect here; main.jsx fires the cheap /api/health ping. -->
+    <link rel="preconnect" href="https://agrosence-1.onrender.com" crossorigin />
     <script>
       // Apply the saved theme before first paint to avoid a flash.
       try {

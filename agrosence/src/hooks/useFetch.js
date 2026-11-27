@@ -23,8 +23,33 @@ import { http } from '../lib/api'
 
 const cache = new Map() // key -> { ts, value, promise, controller, subs }
 
+// Stale-while-revalidate persistence: public, user-independent list endpoints survive reloads (sessionStorage),
+// so a repeat visit paints real data instantly and revalidates in the background.
+const PERSIST_RE = /^\/(agriculture|resources|schemes)(\/|$)/
+const SS = "agro:swr:"
+const MAX_AGE = 30 * 60 * 1000
+const shouldPersist = (url) => PERSIST_RE.test(url)
+function readPersisted(key) {
+  try {
+    const raw = sessionStorage.getItem(SS + key)
+    if (!raw) return null
+    const { ts, value } = JSON.parse(raw)
+    return Date.now() - ts < MAX_AGE ? { ts, value } : null
+  } catch { return null }
+}
+function writePersisted(key, value, ts) {
+  try { sessionStorage.setItem(SS + key, JSON.stringify({ ts, value })) } catch { /* quota / private mode */ }
+}
+function hydrate(key, url) {
+  if (!key || cache.get(key)?.value || !shouldPersist(url)) return cache.get(key)
+  const p = readPersisted(key)
+  if (p) cache.set(key, { subs: 0, value: p.value, ts: p.ts })
+  return cache.get(key)
+}
+
 export function invalidate(prefix = '') {
   for (const k of [...cache.keys()]) if (k.startsWith(prefix)) cache.delete(k)
+  try { for (const k of Object.keys(sessionStorage)) if (k.startsWith(SS + prefix)) sessionStorage.removeItem(k) } catch { /* ignore */ }
 }
 
 const keyOf = (url, params) => `${url}?${params ? JSON.stringify(params, Object.keys(params).sort()) : ''}`
@@ -36,7 +61,7 @@ function load(key, url, params) {
   const controller = new AbortController()
   const p = http
     .get(url, { params, signal: controller.signal })
-    .then((res) => { entry.value = res; entry.ts = Date.now(); return res })
+    .then((res) => { entry.value = res; entry.ts = Date.now(); if (shouldPersist(url)) writePersisted(key, res, entry.ts); return res })
   entry.controller = controller
   entry.promise = p
   const clear = () => { if (entry.promise === p) { entry.promise = null; entry.controller = null } }
@@ -53,7 +78,7 @@ export function useFetch(url, { params, enabled = true, ttl = 30000, select, ini
   selectRef.current = select
 
   const [state, setState] = useState(() => {
-    const hit = key && cache.get(key)
+    const hit = key && hydrate(key, url)
     return hit?.value
       ? { res: hit.value, error: null, loading: false }
       : { res: initialData !== undefined ? { data: initialData } : null, error: null, loading: Boolean(enabled && url) }
@@ -64,7 +89,7 @@ export function useFetch(url, { params, enabled = true, ttl = 30000, select, ini
   useEffect(() => {
     if (!enabled || !key) return undefined
     let active = true
-    const existing = cache.get(key)
+    const existing = hydrate(key, url)
     const fresh = existing?.value && Date.now() - existing.ts < ttl && nonce === 0
     if (existing?.value) setState({ res: existing.value, error: null, loading: false })
     else setState((s) => ({ ...s, error: null, loading: true }))

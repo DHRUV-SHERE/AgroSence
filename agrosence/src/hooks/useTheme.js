@@ -10,10 +10,13 @@ const read = () => { try { return localStorage.getItem(KEY) || 'system' } catch 
 const systemDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches
 
 export function useTheme() {
-  const [theme, setThemeState] = useState(read)
-  const [dark, setDark] = useState(systemDark)
+  // Start from the same values on the server and the client (the page is prerendered), then sync after mount.
+  const [theme, setThemeState] = useState('system')
+  const [dark, setDark] = useState(false)
 
   useEffect(() => {
+    setThemeState(read())
+    setDark(Boolean(systemDark()))
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const on = (e) => setDark(e.matches)
     mq.addEventListener('change', on)

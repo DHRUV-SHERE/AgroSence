@@ -44,8 +44,8 @@
   --overlay: rgb(15 31 23 / 0.55);
 
   /* Type */
-  --font-display: "Inter", "Noto Sans Devanagari", "Noto Sans Gujarati", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-body: "Inter", "Noto Sans Devanagari", "Noto Sans Gujarati", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Inter Variable", "Inter Fallback", "Noto Sans Devanagari Variable", "Noto Sans Gujarati Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter Variable", "Inter Fallback", "Noto Sans Devanagari Variable", "Noto Sans Gujarati Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --fs-xs: 0.78rem;
   --fs-sm: 0.875rem;
@@ -71,7 +71,7 @@
   --s-7: 3rem;
   --s-8: 4.5rem;
   --s-9: 7rem;
-  --gutter: clamp(1rem, 4vw, 2rem);
+  --gutter: clamp(1rem, 3vw, 3rem);
   --section: clamp(3.5rem, 8vw, 6.5rem);
 
   /* Radius */
@@ -93,7 +93,7 @@
 
   --header-h: 4.25rem;
   --sidebar-w: 16.5rem;
-  --maxw: 72rem;
+  --maxw: 120rem; /* ultrawide cap only; layout is fluid below this */
   --measure: 68ch;
 
   color-scheme: light;

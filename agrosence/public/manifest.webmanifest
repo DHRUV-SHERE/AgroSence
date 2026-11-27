@@ -1,0 +1,19 @@
+{
+  "name": "AgroSense: sell crops directly to buyers",
+  "short_name": "AgroSense",
+  "description": "A farmer marketplace and toolkit: sell crops directly, identify plants from a photo, find government schemes and ask the AI chatbot.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "en-IN",
+  "background_color": "#F7F1E3",
+  "theme_color": "#F7F1E3",
+  "categories": ["business", "productivity", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

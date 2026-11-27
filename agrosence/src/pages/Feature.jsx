@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom'
 import { LuArrowRight } from 'react-icons/lu'
 import { Button } from '../components/ui'
+import { CONTENT_UPDATED } from '../seo/site'
 import market from '../assets/Feature/Market Access.webp'
 import crop from '../assets/Feature/Crop Detection.webp'
 import resources from '../assets/Feature/Resource.webp'
@@ -11,7 +12,7 @@ import chatbot from '../assets/Feature/Ai ChatBot.webp'
 
 const FEATURES = [
   { title: 'Market access', to: '/features/MarketAccess', cta: 'Browse the market', img: market, text: 'Showcase your crops to a wider audience by listing them with detailed descriptions, images and pricing. It simplifies connecting with potential buyers, helping you reach local and national markets and increase your sales.' },
-  { title: 'Crop detection report', to: '/features/crop-detection', cta: 'Check a crop', img: crop, text: 'Our machine learning tool identifies diseases, pests and nutrient deficiencies from a photo. Upload a picture of your crop and get detailed feedback on any issue, along with practical solutions and ways to prevent it.' },
+  { title: 'Crop detection', to: '/features/crop-detection', cta: 'Check a crop', img: crop, text: 'Take or upload a clear photo of a leaf or plant and AgroSense identifies it, returning its scientific and common names with a short description. It is a guide, not a lab test: for disease or pest problems, ask an expert.' },
   { title: 'AI chatbot', img: chatbot, text: 'Round-the-clock help with questions about farming practices, pest control, crop management and weather. Tap the chat button at the bottom corner of any page to ask.' },
   { title: 'Resources', to: '/features/resources', cta: 'Explore resources', img: resources, text: 'A library of step-by-step guides, video tutorials and expert tips on sustainable farming, irrigation techniques, soil health and pest management, to improve your yield and farm productivity.' },
   { title: 'Government schemes', to: '/features/government-schemes', cta: 'Find schemes', img: scheme, text: 'Stay up to date with the latest schemes and benefits made for farmers. See subsidies, financial support and agricultural programmes in detail so you do not miss opportunities that could help your farm.' },
@@ -24,7 +25,7 @@ export default function Feature() {
       <section className="ag-pagehero">
         <div className="ag-container">
           <h1>Tools that follow the crop, from seed to sale</h1>
-          <p>Every part of AgroSense is built for the way farmers work: quick on a phone, clear in plain language, and useful on the day you need it.</p>
+          <p>AgroSense gives farmers six tools in one free account: a direct crop market, plant identification from a photo, an AI chatbot, farming resources, government scheme listings and expert advice. Each is built to work on a phone, in plain language.</p>
         </div>
       </section>
       <section className="ag-section">
@@ -39,6 +40,7 @@ export default function Feature() {
               <img src={f.img} alt="" width="588" height="366" loading="lazy" decoding="async" />
             </article>
           ))}
+          <p className="ag-updated">Last updated <time dateTime={CONTENT_UPDATED}>{CONTENT_UPDATED}</time>. Questions? <Link to="/ContactUs">Contact the team</Link> or read <Link to="/About">about the project</Link>. Back to <Link to="/">AgroSense home</Link>.</p>
         </div>
       </section>
     </>

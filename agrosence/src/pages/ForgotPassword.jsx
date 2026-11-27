@@ -8,7 +8,7 @@ import { http } from '../lib/api'
 import { rules, validate } from '../lib/validate'
 import { Alert, Button, Input, PasswordInput, useToast } from '../components/ui'
 import AuthShell from '../components/AuthShell'
-import art from '../assets/Register.webp'
+import art from '../assets/auth-register.webp'
 
 const COOLDOWN = 60 // matches the server: one code per email per 60 s
 

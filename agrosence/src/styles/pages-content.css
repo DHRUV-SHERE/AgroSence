@@ -30,7 +30,7 @@
 .ag-statetile img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: var(--r); background: #fff; }
 
 /* ---------- Scheme list ---------- */
-.ag-schemelist { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-5); max-width: 56rem; }
+.ag-schemelist { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr)); align-items: start; }
 .ag-scheme { display: grid; gap: var(--s-4); padding: var(--s-5); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
 .ag-scheme__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2) var(--s-4); }
 .ag-scheme__head h2 { margin: 0; font-size: var(--fs-xl); max-width: 36ch; }

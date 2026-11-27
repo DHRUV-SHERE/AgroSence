@@ -2,15 +2,17 @@
  * App shell: providers, router, route-level code splitting, scroll restoration, document titles,
  * error boundary and the lazy chatbot. Routes live in src/routes.jsx (do not add routes here).
  */
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Route, Routes, matchPath, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
-import { ErrorBoundary, PageLoader, ToastProvider } from './components/ui'
+import { ErrorBoundary, NetworkStatus, RouteFallback, ToastProvider } from './components/ui'
 import { GuestRoute, ProtectedRoute } from './components/ProtectedRoute'
 import PublicLayout from './layouts/PublicLayout'
 import AppLayout from './layouts/AppLayout'
 import { NotFoundPage, ROUTES } from './routes'
 import { SITE } from './hooks/useDocumentTitle'
+import Seo from './seo/Seo'
+import { pageKey } from './seo/meta'
 
 const Chatbot = lazy(() => import('./components/chatbot/Chatbot'))
 const NO_CHAT = ['/login', '/signup', '/forgot-password']
@@ -25,14 +27,49 @@ function RouteEffects() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [pathname, hash])
 
+  // Move focus to the new page (skip the very first render) so keyboard and screen-reader users start at the top.
+  const first = useRef(true)
+  useEffect(() => {
+    if (first.current) { first.current = false; return }
+    if (hash) return
+    document.getElementById('main')?.focus({ preventScroll: true })
+  }, [pathname, hash])
+
   useEffect(() => {
     const match = ROUTES.find((r) => matchPath({ path: r.path, end: true }, pathname))
     const title = match ? match.title : 'Page not found'
-    document.title = match?.path === '/' ? `${SITE} | ${title}` : `${title} | ${SITE}`
+    // Public pages get their title (and the rest of the head) from <Seo />.
+    if (!pageKey(pathname)) document.title = match?.path === '/' ? `${SITE} | ${title}` : `${title} | ${SITE}`
     setAnnounce(title)
   }, [pathname])
 
   return <div className="ag-sr-only" role="status" aria-live="polite">{announce}</div>
+}
+
+/** Prefetch a route's chunk when the user shows intent (hover, focus, touch) and a few likely ones when idle. */
+function RoutePrefetch() {
+  useEffect(() => {
+    const warm = (href) => {
+      let path
+      try { const u = new URL(href, window.location.origin); if (u.origin !== window.location.origin) return; path = u.pathname } catch { return }
+      ROUTES.find((r) => matchPath({ path: r.path, end: true }, path))?.component?.preload?.()
+    }
+    const onIntent = (e) => { const a = e.target?.closest?.('a[href]'); if (a) warm(a.getAttribute('href')) }
+    document.addEventListener('pointerover', onIntent, { passive: true })
+    document.addEventListener('focusin', onIntent)
+    document.addEventListener('touchstart', onIntent, { passive: true })
+    let timer
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 2500))
+    const id = idle(() => { timer = setTimeout(() => ['/Login', '/Signup', '/Feature'].forEach(warm), 5000) }, { timeout: 6000 })
+    return () => {
+      document.removeEventListener('pointerover', onIntent)
+      document.removeEventListener('focusin', onIntent)
+      document.removeEventListener('touchstart', onIntent)
+      clearTimeout(timer)
+      if (window.cancelIdleCallback && window.requestIdleCallback) window.cancelIdleCallback(id)
+    }
+  }, [])
+  return null
 }
 
 /** Mount the chatbot only after the page is idle so it never competes with first paint. */
@@ -60,13 +97,13 @@ const renderRoutes = (list) => list.map((r) => {
   return <Route key={r.path} path={r.path} element={<Page />} />
 })
 
-function AppRoutes() {
-  const by = (layout) => ROUTES.filter((r) => r.layout === layout)
+function AppRoutes({ routes, NotFound }) {
+  const by = (layout) => routes.filter((r) => r.layout === layout)
   return (
     <Routes>
       <Route element={<PublicLayout />}>
         {renderRoutes(by('public'))}
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
 
       <Route element={<GuestRoute />}>{renderRoutes(by('auth'))}</Route>
@@ -87,20 +124,33 @@ function AppRoutes() {
   )
 }
 
+/**
+ * Everything inside the router. The build-time prerenderer (src/entry-server.jsx) renders this same tree inside a
+ * StaticRouter with eagerly imported pages (`routes`), so the HTML it emits matches what the client hydrates.
+ */
+export function AppContent({ routes = ROUTES, NotFound = NotFoundPage }) {
+  return (
+    <AuthProvider>
+      <ToastProvider>
+        <RouteEffects />
+        <RoutePrefetch />
+        <NetworkStatus />
+        <Seo />
+        <RoutedBoundary>
+          <Suspense fallback={<RouteFallback />}>
+            <AppRoutes routes={routes} NotFound={NotFound} />
+          </Suspense>
+        </RoutedBoundary>
+        <LazyChatbot />
+      </ToastProvider>
+    </AuthProvider>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <RouteEffects />
-          <RoutedBoundary>
-            <Suspense fallback={<PageLoader />}>
-              <AppRoutes />
-            </Suspense>
-          </RoutedBoundary>
-          <LazyChatbot />
-        </ToastProvider>
-      </AuthProvider>
+      <AppContent />
     </BrowserRouter>
   )
 }

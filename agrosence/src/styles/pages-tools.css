@@ -121,7 +121,7 @@
 .ag-tips .ag-iconbtn[disabled] { opacity: 0.4; cursor: default; }
 
 /* ---------- Settings ---------- */
-.ag-settings { display: grid; gap: var(--s-5); max-width: 46rem; }
+.ag-settings { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr)); align-items: start; }
 .ag-avatarrow { display: flex; gap: var(--s-4); align-items: flex-start; }
 .ag-avatarrow .ag-avatar { margin-top: 1.4rem; }
 .ag-avatarrow__field { flex: 1; }

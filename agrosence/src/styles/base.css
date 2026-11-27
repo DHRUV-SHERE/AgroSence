@@ -10,7 +10,7 @@ body {
   font-size: var(--fs-base);
   line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+
   overflow-x: hidden;
 }
 #root { min-height: 100vh; display: flex; flex-direction: column; }
@@ -21,7 +21,7 @@ h1 { font-size: var(--fs-3xl); line-height: var(--lh-tight); }
 h2 { font-size: var(--fs-2xl); line-height: var(--lh-tight); }
 h3 { font-size: var(--fs-xl); }
 h4 { font-size: var(--fs-lg); }
-p { margin: 0 0 var(--s-4); text-wrap: pretty; }
+p { margin: 0 0 var(--s-4); }
 a { color: var(--clay); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 a:hover { color: var(--clay-hover); }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -59,8 +59,8 @@ table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nu
 .ag-skip:focus { top: var(--s-3); color: var(--paper); }
 
 /* Page enter: one short fade so route changes feel connected */
-.ag-page { animation: ag-fade var(--dur-3) var(--ease-out) both; }
-@keyframes ag-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ag-page { animation: ag-fade 160ms ease-out both; }
+@keyframes ag-fade { from { opacity: 0.4; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

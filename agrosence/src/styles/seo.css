@@ -1,0 +1,28 @@
+/* Answer-first content blocks used by the public pages: key facts, numbered steps, FAQ accordion, "last updated". */
+
+/* Key facts: label / value rows on ruled lines */
+.ag-facts { display: grid; margin: 0; border-top: 1px solid var(--line-strong); max-width: 52rem; }
+.ag-facts > div { display: grid; grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr); gap: var(--s-4); padding: var(--s-3) 0; border-bottom: 1px solid var(--line-strong); }
+.ag-facts dt { color: var(--ink-3); font-size: var(--fs-sm); font-weight: 600; }
+.ag-facts dd { margin: 0; color: var(--ink); }
+@media (max-width: 36rem) { .ag-facts > div { grid-template-columns: 1fr; gap: var(--s-1); } }
+
+/* How it works: ordered steps with a clay numeral */
+.ag-steps { list-style: none; counter-reset: ag-step; margin: 0; padding: 0; display: grid; gap: var(--s-5); max-width: 52rem; }
+.ag-steps li { counter-increment: ag-step; display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--s-4); align-items: start; }
+.ag-steps li::before { content: counter(ag-step); font-family: var(--font-display); font-size: var(--fs-2xl); line-height: 1; color: var(--clay); font-variant-numeric: tabular-nums; }
+.ag-steps h3 { margin: 0 0 var(--s-1); font-size: var(--fs-lg); }
+.ag-steps p { margin: 0; color: var(--ink-2); }
+
+/* FAQ accordion (native <details>, works without JavaScript) */
+.ag-qa { border-top: 1px solid var(--line-strong); max-width: 52rem; }
+.ag-qa details { border-bottom: 1px solid var(--line-strong); padding: var(--s-2) 0; }
+.ag-qa summary { display: flex; justify-content: space-between; gap: var(--s-4); align-items: center; min-height: 2.75rem; cursor: pointer; font-weight: 600; font-size: var(--fs-md); list-style: none; }
+.ag-qa summary::-webkit-details-marker { display: none; }
+.ag-qa summary::after { content: "+"; flex: none; font-family: var(--font-display); font-size: var(--fs-lg); color: var(--clay); line-height: 1; }
+.ag-qa details[open] summary::after { content: "\2212"; }
+.ag-qa summary:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; border-radius: var(--r-sm, 4px); }
+.ag-qa p { margin: 0 0 var(--s-3); color: var(--ink-2); max-width: var(--measure); }
+
+.ag-updated { color: var(--ink-3); font-size: var(--fs-sm); margin-top: var(--s-5); }
+.ag-defn { font-size: var(--fs-md); color: var(--ink-2); max-width: var(--measure); }

@@ -1,0 +1,46 @@
+# AgroSense (AgroSence) - https://agrosence.vercel.app
+# Public pages are open to search engines and AI crawlers (search, citation and training alike).
+# Signed-in app pages are disallowed; they hold nothing indexable.
+# Machine-readable summaries for LLMs: /llms.txt (short) and /llms-full.txt (full).
+
+User-agent: *
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: DuckDuckBot
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: Google-Extended
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: CCBot
+Allow: /
+Disallow: /dashboard
+Disallow: /Dashboard
+Disallow: /Setting
+Disallow: /setting
+Disallow: /OrderHistory
+Disallow: /orderhistory
+Disallow: /CropSell
+Disallow: /cropsell
+Disallow: /product
+Disallow: /Product
+Disallow: /Reports
+Disallow: /reports
+Disallow: /Routine
+Disallow: /routine
+Disallow: /LiveCropPricing
+Disallow: /livecroppricing
+Disallow: /QuickSupport
+Disallow: /quicksupport
+Disallow: /features/
+Disallow: /state-schemes/
+Disallow: /forgot-password
+Disallow: /403
+
+Sitemap: https://agrosence.vercel.app/sitemap.xml

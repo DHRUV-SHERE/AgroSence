@@ -26,6 +26,7 @@
  */
 import axios from 'axios'
 import { tokenStore } from './tokens'
+import { net } from './net'
 
 const DEV_ORIGIN = import.meta.env.DEV ? `http://${window.location.hostname}:5000` : ''
 export const API_ORIGIN = (import.meta.env.VITE_API_URL ?? DEV_ORIGIN).replace(/\/+$/, '')
@@ -124,17 +125,49 @@ function normalise(error) {
   )
 }
 
+const RETRY_STATUS = new Set([502, 503, 504])
+const RETRY_DELAYS = [1500, 3000, 6000] // ms; a cold-starting Render service usually answers within ~50s
+const cancelled = () => Object.assign(new Error('canceled'), { code: 'ERR_CANCELED' })
+const sleep = (ms, signal) => new Promise((resolve, reject) => {
+  if (signal?.aborted) return reject(cancelled())
+  const t = setTimeout(resolve, ms)
+  signal?.addEventListener?.('abort', () => { clearTimeout(t); reject(cancelled()) }, { once: true })
+})
+
+/** GETs (idempotent) retry on network errors, timeouts and 502/503/504 with backoff; anything else fails fast. */
+function shouldRetry(config, error, attempt) {
+  if ((config.method || 'get') !== 'get' || attempt >= RETRY_DELAYS.length) return false
+  if (axios.isCancel?.(error) || error?.code === 'ERR_CANCELED') return false
+  if (!error.response) return true
+  return RETRY_STATUS.has(error.response.status)
+}
+
 async function request(config) {
+  const id = net.begin()
   try {
-    const res = await api.request(config)
-    const body = res.data
-    if (body && typeof body === 'object' && 'success' in body) {
-      return { data: body.data, meta: body.meta, message: body.message }
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        const res = await api.request(config)
+        const body = res.data
+        if (body && typeof body === 'object' && 'success' in body) {
+          return { data: body.data, meta: body.meta, message: body.message }
+        }
+        return { data: body, meta: undefined, message: undefined }
+      } catch (e) {
+        if (!shouldRetry(config, e, attempt)) throw normalise(e)
+        try { await sleep(RETRY_DELAYS[attempt], config.signal) } catch (c) { throw normalise(c) }
+      }
     }
-    return { data: body, meta: undefined, message: undefined }
-  } catch (e) {
-    throw normalise(e)
+  } finally {
+    net.end(id)
   }
+}
+
+/** Fire-and-forget wake-up ping for the API (cold start). Never throws, never shows UI. */
+export function warmUpApi() {
+  try {
+    fetch(`${API_BASE}/health`, { method: 'GET', mode: 'no-cors', cache: 'no-store', keepalive: true }).catch(() => {})
+  } catch { /* ignore */ }
 }
 
 export const http = {

@@ -13,7 +13,12 @@
  */
 import { lazy } from 'react'
 
-const page = (loader) => lazy(loader)
+/** lazy() + a `preload()` so route chunks can be fetched on hover/focus/idle (see App.jsx). */
+const page = (loader) => {
+  const C = lazy(loader)
+  C.preload = loader
+  return C
+}
 
 export const ROUTES = [
   // Public

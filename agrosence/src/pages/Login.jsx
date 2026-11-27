@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { rules, validate } from '../lib/validate'
 import { Alert, Button, Checkbox, Input, PasswordInput } from '../components/ui'
 import AuthShell from '../components/AuthShell'
-import art from '../assets/home/s2.webp'
+import art from '../assets/home/auth-login.webp'
 
 const remembered = () => { try { return localStorage.getItem('agro_remember_id') || '' } catch { return '' } }
 

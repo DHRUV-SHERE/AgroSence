@@ -6,7 +6,10 @@ import { Link } from 'react-router-dom'
 import { LuArrowRight } from 'react-icons/lu'
 import { Button } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
-import hero from '../assets/home/s3.webp'
+import { CONTENT_UPDATED } from '../seo/site'
+import { DEFINITION, FACTS, FAQ, STEPS } from '../seo/content'
+import hero720 from '../assets/home/hero-720.webp'
+import hero480 from '../assets/home/hero-480.webp'
 import marketImg from '../assets/home/market access.webp'
 import cropImg from '../assets/home/crop detection.webp'
 import chatImg from '../assets/home/AI chat bot.webp'
@@ -18,7 +21,7 @@ import ourProject from '../assets/home/about our project.webp'
 
 const FEATURES = [
   { to: '/features/MarketAccess', title: 'Market access', img: marketImg, text: 'List your crops with photos, quantity and your own price. Buyers across the country can see them and order directly from you.' },
-  { to: '/features/crop-detection', title: 'Crop detection', img: cropImg, text: 'Upload a photo of a leaf or plant. Our model names the crop, flags likely diseases, pests or nutrient gaps, and suggests what to do next.' },
+  { to: '/features/crop-detection', title: 'Crop detection', img: cropImg, text: 'Take or upload a photo of a leaf or plant. AgroSense identifies it and gives its scientific and common names with a short description.' },
   { to: '/Feature', title: 'AI chatbot', img: chatImg, text: 'Ask about pest control, crop care or weather any time of day. Answers come back in seconds, in plain language.' },
   { to: '/features/resources', title: 'Farming resources', img: resourceImg, text: 'Step-by-step guides, tutorials and expert tips on irrigation, soil health, sustainable farming and pest management.' },
   { to: '/features/government-schemes', title: 'Government schemes', img: schemeImg, text: 'Browse subsidies, financial support and schemes by state so you do not miss support you are entitled to.' },
@@ -36,10 +39,7 @@ export default function Home() {
               <span className="ag-hero__line"><span>Sell your harvest.</span></span>
               <span className="ag-hero__line"><span className="ag-em">Keep the price.</span></span>
             </h1>
-            <p className="ag-lede">
-              AgroSense connects farmers directly with buyers, with no middleman in between. Check crop health with AI,
-              follow government schemes and get expert advice, all in the language you farm in.
-            </p>
+            <p className="ag-lede">{DEFINITION}</p>
             <div className="ag-hero__cta">
               {isAuthenticated ? (
                 <Button as={Link} to="/dashboard" variant="primary" size="lg" icon={<LuArrowRight aria-hidden="true" />}>Open your dashboard</Button>
@@ -56,9 +56,20 @@ export default function Home() {
           </div>
           <div className="ag-hero__media">
             <span className="ag-hero__sun" aria-hidden="true" />
-            <img className="ag-hero__photo" src={hero} alt="A farmer walking through terraced rice fields in the morning light" width="1600" height="1066" fetchpriority="high" decoding="async" />
+            <img className="ag-hero__photo" src={hero720} srcSet={`${hero480} 480w, ${hero720} 720w`} sizes="(max-width: 52rem) 78vw, 32rem" alt="A farmer walking through terraced rice fields in the morning light" width="720" height="900" fetchPriority="high" decoding="async" />
             <p className="ag-hero__stamp">Direct from the farmer to the buyer</p>
           </div>
+        </div>
+      </section>
+
+      <section className="ag-section" style={{ paddingTop: 0 }} aria-labelledby="facts-h">
+        <div className="ag-container">
+          <div className="ag-sechead">
+            <h2 id="facts-h">AgroSense at a glance</h2>
+          </div>
+          <dl className="ag-facts">
+            {FACTS.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+          </dl>
         </div>
       </section>
 
@@ -80,6 +91,18 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="ag-section" aria-labelledby="how-h">
+        <div className="ag-container">
+          <div className="ag-sechead">
+            <h2 id="how-h">How does AgroSense work for farmers?</h2>
+            <p>Four steps from sign-up to a sale.</p>
+          </div>
+          <ol className="ag-steps">
+            {STEPS.map((st) => <li key={st.name}><div><h3>{st.name}</h3><p>{st.text}</p></div></li>)}
+          </ol>
         </div>
       </section>
 
@@ -107,6 +130,23 @@ export default function Home() {
             </div>
             <img src={ourProject} alt="" width="471" height="371" loading="lazy" decoding="async" />
           </div>
+        </div>
+      </section>
+
+      <section className="ag-section" aria-labelledby="faq-h">
+        <div className="ag-container">
+          <div className="ag-sechead">
+            <h2 id="faq-h">Frequently asked questions about AgroSense</h2>
+          </div>
+          <div className="ag-qa">
+            {FAQ.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <p className="ag-updated">Last updated <time dateTime={CONTENT_UPDATED}>{CONTENT_UPDATED}</time>. AgroSense is a student project from Ganpat University, Gujarat. <Link to="/About">About the team</Link> · <Link to="/ContactUs">Contact us</Link></p>
         </div>
       </section>
 
