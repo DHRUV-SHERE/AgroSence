@@ -1,280 +1,169 @@
-import { fetchUtils } from "react-admin";
-import simpleRestProvider from "ra-data-simple-rest";
+import type { DataProvider, RaRecord } from "react-admin";
+import { request } from "./api/http";
+import type { ApiUser, Stats, UserRole } from "./api/types";
 
-const API_URL = "http://localhost:5000/api";
-const httpClient = fetchUtils.fetchJson;
-const dataProvider = simpleRestProvider(API_URL, httpClient);
+/** Maps react-admin resource names onto contract endpoints. */
+const ENDPOINT: Record<string, string> = {
+  users: "/admin/users",
+  crops: "/admin/crops",
+  orders: "/admin/orders",
+  contacts: "/admin/contacts",
+  schemes: "/admin/schemes",
+  resources: "/admin/resources",
+  "audit-logs": "/admin/audit-logs",
+};
 
-const customDataProvider = {
-  ...dataProvider,
+/** Public fallbacks: the contract only lists writes for these under /admin. */
+const PUBLIC_FALLBACK: Record<string, string> = {
+  schemes: "/schemes",
+  resources: "/resources",
+};
 
-  getList: async (resource, params) => {
-    let url = "";
+const endpoint = (resource: string) => {
+  const e = ENDPOINT[resource];
+  if (!e) throw new Error(`Unknown resource "${resource}"`);
+  return e;
+};
 
-    switch (resource) {
-      case "contacts":
-        url = `${API_URL}/contact/submit`;
-        break;
-      case "users":
-        url = `${API_URL}/auth/users`;
-        break;
-      case "schemes":
-        url = `${API_URL}/schemes/all`;
-        break;
-      case "resources":
-        url = `${API_URL}/resources/all`; // Ensure correct endpoint
-        break;
-      default:
-        throw new Error(`Unknown resource: ${resource}`);
-    }
+type Raw = Record<string, unknown>;
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Error fetching ${resource}: ${response.status} - ${response.statusText}`);
-      }
+const isRawFile = (v: unknown): v is { rawFile: File } =>
+  typeof v === "object" && v !== null && (v as { rawFile?: unknown }).rawFile instanceof File;
 
-      const data = await response.json();
-      console.log(`Fetched ${resource}:`, data);
+const READONLY_KEYS = new Set(["id", "_id", "createdAt", "updatedAt", "__v", "userId"]);
 
-      if (!data || !data.data) {
-        throw new Error(`Invalid response structure for ${resource}`);
-      }
+/** Builds a JSON body, or FormData when a new file was picked. */
+const buildPayload = (data: Raw): { json?: Raw; form?: FormData } => {
+  const clean: Raw = {};
+  Object.entries(data).forEach(([k, v]) => {
+    if (READONLY_KEYS.has(k) || v === undefined) return;
+    // An existing image URL stays server-side; only a new file is sent.
+    if (k === "image" && !isRawFile(v)) return;
+    clean[k] = v;
+  });
+  if (!Object.values(clean).some(isRawFile)) return { json: clean };
+  const form = new FormData();
+  Object.entries(clean).forEach(([k, v]) => {
+    if (isRawFile(v)) form.append(k, v.rawFile);
+    else if (v !== null) form.append(k, String(v));
+  });
+  return { form };
+};
 
-      return {
-        data: data.data.map((item) => ({
-          id: item._id || item.id, // Ensure correct ID mapping
-          ...item,
-          imageUrl: `${item.image}`,
-        })),
-        total: data.data.length,
-      };
-    } catch (error) {
-      console.error(`Error fetching ${resource}:`, error);
-      throw new Error(`Failed to fetch ${resource}: ${error.message}`);
-    }
+const normalize = <T extends RaRecord>(row: unknown): T => {
+  const r = row as Raw;
+  return { ...r, id: (r.id ?? r._id) as string } as T;
+};
+
+const status = (e: unknown) => (e as { status?: number }).status;
+
+const getList: DataProvider["getList"] = async (resource, params) => {
+  const { page, perPage } = params.pagination ?? { page: 1, perPage: 20 };
+  const { field, order } = params.sort ?? { field: "createdAt", order: "DESC" };
+  const query: Record<string, string | number | undefined> = {
+    page,
+    limit: perPage,
+    sort: field ? `${order === "DESC" ? "-" : ""}${field === "id" ? "createdAt" : field}` : undefined,
+  };
+  Object.entries(params.filter ?? {}).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== "") query[k] = String(v);
+  });
+  let res;
+  try {
+    res = await request<unknown[]>(endpoint(resource), { query });
+  } catch (e) {
+    const fb = PUBLIC_FALLBACK[resource];
+    if (fb && status(e) === 404) res = await request<unknown[]>(fb, { query });
+    else throw e;
+  }
+  const rows = Array.isArray(res.data) ? res.data : [];
+  return { data: rows.map((r) => normalize(r)) as never[], total: res.meta?.total ?? rows.length };
+};
+
+const getOne: DataProvider["getOne"] = async (resource, params) => {
+  let res;
+  try {
+    res = await request<unknown>(`${endpoint(resource)}/${params.id}`);
+  } catch (e) {
+    const fb = PUBLIC_FALLBACK[resource];
+    if (fb && status(e) === 404) res = await request<unknown>(`${fb}/${params.id}`);
+    else throw e;
+  }
+  return { data: normalize(res.data) as never };
+};
+
+export interface AgroDataProvider extends DataProvider {
+  getStats(): Promise<Stats>;
+  setUserRole(id: string, role: UserRole): Promise<ApiUser>;
+  setUserActive(id: string, active: boolean): Promise<ApiUser>;
+}
+
+const dataProvider: AgroDataProvider = {
+  getList,
+  getOne,
+
+  async getMany(resource, params) {
+    const rows = await Promise.all(params.ids.map((id) => getOne(resource, { id })));
+    return { data: rows.map((r) => r.data) as never[] };
   },
 
-  create: async (resource, params) => {
-    let url;
-    let body;
-    let headers = {}; // Empty headers for FormData requests
-
-    switch (resource) {
-      case "resources":
-        url = `${API_URL}/resources/add`;
-
-        // Creating FormData for file upload
-        const formData = new FormData();
-        Object.keys(params.data).forEach((key) => {
-          formData.append(key, params.data[key]);
-        });
-
-        body = formData;
-        break;
-
-      case "schemes":
-        url = `${API_URL}/schemes/add`;
-        body = JSON.stringify(params.data);
-        headers = { "Content-Type": "application/json" };
-        break;
-
-      default:
-        return dataProvider.create(resource, params);
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        body,
-        headers, // Do not set headers manually for FormData (browser does it automatically)
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`Error adding ${resource}: ${response.status} - ${errorMessage}`);
-      }
-
-      const data = await response.json();
-      return { data: { id: data._id, ...data } };
-    } catch (error) {
-      console.error(`Error creating ${resource}:`, error);
-      throw new Error(`Failed to create ${resource}: ${error.message}`);
-    }
+  async getManyReference(resource, params) {
+    return getList(resource, { ...params, filter: { ...params.filter, [params.target]: params.id } });
   },
 
-  getOrderDetails: async () => {
-    try {
-        const token = localStorage.getItem("token"); // Ensure admin authentication
-        const response = await fetch(`${API_URL}/orders`, { // ⬅ No userId required
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, 
-            },
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch orders: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log("Fetched orders:", data);
-
-        return data || []; // Return empty array to prevent errors
-    } catch (error) {
-        console.error("Order fetch error:", error);
-        return []; // Return empty array to prevent crashes
-    }
-},
-
-
-  getDashboardStats: async () => {
-    try {
-      const response = await fetch(`${API_URL}/dashboard/stats`);
-      if (!response.ok) throw new Error("Failed to fetch dashboard stats");
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Dashboard stats error:", error);
-      return { users: 0, contacts: 0, schemes: 0, resources: 0 };
-    }
+  async create(resource, params) {
+    const { json, form } = buildPayload(params.data as Raw);
+    const res = await request<unknown>(endpoint(resource), { method: "POST", json, form });
+    return { data: normalize(res.data) as never };
   },
 
-  create: async (resource, params) => {
-    let url;
-    let body;
-    let headers = {}; // Do not set Content-Type manually for FormData
-
-    switch (resource) {
-      case "resources":
-        url = `${API_URL}/resources/add`;
-
-        // Create FormData for file upload
-        const formData = new FormData();
-        formData.append("name", params.data.name);
-        formData.append("description", params.data.description);
-        formData.append("link", params.data.link);
-        formData.append("purpose", params.data.purpose);
-        formData.append("advantages", params.data.advantages);
-        formData.append("howtouse", params.data.howtouse);
-        formData.append("popularbrand", params.data.popularbrand);
-
-        if (params.data.image && params.data.image.rawFile) {
-          formData.append("image", params.data.image.rawFile);
-        } else {
-          console.error("No image file found in params.data");
-        }
-
-        body = formData;
-        break;
-
-      case "schemes":
-        url = `${API_URL}/schemes/add`;
-
-        // Scheme Data in JSON Format
-        body = JSON.stringify({
-          name: params.data.name,
-          description: params.data.description,
-          eligibility: params.data.eligibility,
-          benefits: params.data.benefits,
-          state: params.data.state || "All States",
-          applyLink: params.data.applyLink,
-        });
-
-        headers = { "Content-Type": "application/json" }; // JSON headers
-        break;
-
-      default:
-        return dataProvider.create(resource, params);
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        body,
-        headers, // Set headers only for JSON data
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`Error adding ${resource}: ${response.status} - ${errorMessage}`);
-      }
-
-      const data = await response.json();
-      return { data: { id: data.scheme._id, ...data.scheme } }; // Use scheme._id from the response
-    } catch (error) {
-      console.error(`Error creating ${resource}:`, error);
-      throw new Error(`Failed to create ${resource}: ${error.message}`);
-    }
+  async update(resource, params) {
+    const { json, form } = buildPayload(params.data as Raw);
+    const res = await request<unknown>(`${endpoint(resource)}/${params.id}`, {
+      method: "PUT",
+      json,
+      form,
+    });
+    return { data: normalize(res.data ?? { ...params.data, id: params.id }) as never };
   },
 
-  update: async (resource, params) => {
-    let url;
-    let body;
-
-    switch (resource) {
-      case "resources":
-        url = `${API_URL}/resources/update/${params.id}`;
-        body = JSON.stringify(params.data);
-        break;
-
-      case "schemes":
-        url = `${API_URL}/schemes/update/${params.id}`;
-        body = JSON.stringify(params.data);
-        break;
-
-      default:
-        return dataProvider.update(resource, params);
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error updating ${resource}: ${response.statusText}`);
-      }
-
-      return { data: params.data };
-    } catch (error) {
-      console.error(`Error updating ${resource}:`, error);
-      throw new Error(`Failed to update ${resource}`);
-    }
+  async updateMany(resource, params) {
+    const { json } = buildPayload(params.data as Raw);
+    await Promise.all(params.ids.map((id) => request(`${endpoint(resource)}/${id}`, { method: "PUT", json })));
+    return { data: params.ids };
   },
 
-  delete: async (resource, params) => {
-    let url;
+  async delete(resource, params) {
+    await request(`${endpoint(resource)}/${params.id}`, { method: "DELETE" });
+    return { data: { ...(params.previousData ?? {}), id: params.id } as never };
+  },
 
-    switch (resource) {
-      case "resources":
-        url = `${API_URL}/resources/delete/${params.id}`;
-        break;
-      case "schemes":
-        url = `${API_URL}/schemes/delete/${params.id}`;
-        break;
-      default:
-        return dataProvider.delete(resource, params);
+  /** The contract has no bulk endpoint, so fan out and report partial failures. */
+  async deleteMany(resource, params) {
+    const results = await Promise.allSettled(
+      params.ids.map((id) => request(`${endpoint(resource)}/${id}`, { method: "DELETE" })),
+    );
+    const failed = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+    if (failed.length) {
+      const reason = (failed[0].reason as Error)?.message ?? "unknown error";
+      throw new Error(`${failed.length} of ${params.ids.length} could not be deleted: ${reason}`);
     }
+    return { data: params.ids };
+  },
 
-    try {
-      const response = await fetch(url, { method: "DELETE" });
+  async getStats() {
+    return (await request<Stats>("/admin/stats")).data;
+  },
 
-      if (!response.ok) {
-        throw new Error(`Error deleting ${resource}: ${response.statusText}`);
-      }
+  async setUserRole(id, role) {
+    const res = await request<ApiUser>(`/admin/users/${id}/role`, { method: "PATCH", json: { role } });
+    return normalize<ApiUser & RaRecord>(res.data);
+  },
 
-      return { data: { id: params.id } };
-    } catch (error) {
-      console.error(`Error deleting ${resource}:`, error);
-      throw new Error(`Failed to delete ${resource}`);
-    }
+  async setUserActive(id, active) {
+    const res = await request<ApiUser>(`/admin/users/${id}/status`, { method: "PATCH", json: { active } });
+    return normalize<ApiUser & RaRecord>(res.data);
   },
 };
 
-export default customDataProvider;
+export default dataProvider;

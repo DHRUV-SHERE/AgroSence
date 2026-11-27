@@ -1,192 +1,69 @@
-import React from "react";
-import {
-  Admin,
-  Resource,
-  List,
-  Create,
-  Edit,
-  SimpleForm,
-  TextInput,
-  Datagrid,
-  TextField,
-  EditButton,
-  DeleteButton,
-  SelectInput,
-  ImageField,
-  FileInput,
-  FileField
-} from "react-admin";
-import customDataProvider from "./dataProvider";
+import { lazy } from "react";
+import { Admin, CustomRoutes, Resource } from "react-admin";
+import { Route } from "react-router-dom";
+import dataProvider from "./dataProvider";
 import authProvider from "./authProvider";
-import Dashboard from "./components/Dashboard";
-import AnalyticsDashboard from "./components/Analytic";
+import { Layout } from "./layout/Layout";
+import { darkTheme, lightTheme } from "./theme";
+import LoginPage from "./pages/LoginPage";
+import { ContactList, ContactShow } from "./resources/contacts";
+import { CropList, CropShow } from "./resources/crops";
+import { OrderList, OrderShow } from "./resources/orders";
+import { ResourceCreate, ResourceEdit, ResourceList } from "./resources/resourcesRes";
+import { SchemeCreate, SchemeEdit, SchemeList } from "./resources/schemes";
+import { UserEdit, UserList, UserShow } from "./resources/users";
+import { AuditLogList, AuditLogShow } from "./resources/auditLogs";
+import SchemeIcon from "@mui/icons-material/AccountBalanceOutlined";
+import ResourceIcon from "@mui/icons-material/Inventory2Outlined";
+import MailIcon from "@mui/icons-material/MailOutline";
+import GrassIcon from "@mui/icons-material/GrassOutlined";
+import OrdersIcon from "@mui/icons-material/ShoppingBagOutlined";
+import PeopleIcon from "@mui/icons-material/PeopleAltOutlined";
+import AuditIcon from "@mui/icons-material/HistoryOutlined";
 
-const states: { id: string; name: string }[] = [
-  { id: "all-states", name: "All States" },
-  { id: "andhra-pradesh", name: "Andhra Pradesh" },
-  { id: "arunachal-pradesh", name: "Arunachal Pradesh" },
-  { id: "assam", name: "Assam" },
-  { id: "bihar", name: "Bihar" },
-  { id: "chhattisgarh", name: "Chhattisgarh" },
-  { id: "goa", name: "Goa" },
-  { id: "gujarat", name: "Gujarat" },
-  { id: "haryana", name: "Haryana" },
-  { id: "himachal-pradesh", name: "Himachal Pradesh" },
-  { id: "jharkhand", name: "Jharkhand" },
-  { id: "karnataka", name: "Karnataka" },
-  { id: "kerala", name: "Kerala" },
-  { id: "madhya-pradesh", name: "Madhya Pradesh" },
-  { id: "maharashtra", name: "Maharashtra" },
-  { id: "manipur", name: "Manipur" },
-  { id: "meghalaya", name: "Meghalaya" },
-  { id: "mizoram", name: "Mizoram" },
-  { id: "nagaland", name: "Nagaland" },
-  { id: "odisha", name: "Odisha" },
-  { id: "punjab", name: "Punjab" },
-  { id: "rajasthan", name: "Rajasthan" },
-  { id: "sikkim", name: "Sikkim" },
-  { id: "tamil-nadu", name: "Tamil Nadu" },
-  { id: "telangana", name: "Telangana" },
-  { id: "tripura", name: "Tripura" },
-  { id: "uttar-pradesh", name: "Uttar Pradesh" },
-  { id: "uttarakhand", name: "Uttarakhand" },
-  { id: "west-bengal", name: "West Bengal" },
-];
-// For User List
-const UserList = () => (
-  <List>
-    <Datagrid>
-      <TextField source="id" />
-      <TextField source="name" />
-      <TextField source="email" />
-      <TextField source="mobile" /> {/* Check if this is 'mobile' or 'phoneNumber' */}
-      <TextField source="state" />
-      <TextField source="language" />
-      <TextField source="address" />
-    </Datagrid>
-  </List>
-);
+// Charts (recharts) live in the dashboard chunk only.
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
 
-// For Contact List
-const ContactList = () => (
-  <List>
-    <Datagrid>
-      <TextField source="id" />
-      <TextField source="name" />
-      <TextField source="mobile" /> {/* Ensure correct field name */}
-      <TextField source="email" /> {/* Ensure email exists */}
-      <TextField source="address" />
-      <TextField source="message" />
-      <TextField source="dateSubmitted" />
-      <DeleteButton />
-    </Datagrid>
-  </List>
-);
-
-
-const SchemeList: React.FC = () => (
-  <List>
-    <Datagrid>
-      <TextField source="id" />
-      <TextField source="name" />
-      <TextField source="description" />
-      <TextField source="eligibility" />
-      <TextField source="benefits" />
-      <TextField source="applyLink" />
-      <TextField source="state" />
-      <EditButton />
-      <DeleteButton />
-    </Datagrid>
-  </List>
-);
-
-// Define the SchemeCreate Component
-const SchemeCreate: React.FC = () => (
-  <Create>
-    <SimpleForm>
-      <TextInput source="name" required />
-      <TextInput source="description" required />
-      <TextInput source="eligibility" required />
-      <TextInput source="benefits" required />
-      <TextInput source="applyLink" required />
-      <SelectInput source="state" choices={states} defaultValue="All States" />
-    </SimpleForm>
-  </Create>
-);
-
-// Define the SchemeEdit Component
-const SchemeEdit: React.FC = () => (
-  <Edit>
-    <SimpleForm>
-      <TextInput source="name" required />
-      <TextInput source="description" required />
-      <TextInput source="eligibility" required />
-      <TextInput source="benefits" required />
-      <TextInput source="applyLink" required />
-      <SelectInput source="state" choices={states} />
-    </SimpleForm>
-  </Edit>
-);
-
-const ResourceList = () => (
-  <List>
-    <Datagrid>
-      <TextField source="name" label="Resource Name" />
-      <TextField source="description" label="Description" />
-      <ImageField source="image" label="Image" title="Resource Image" />
-      <TextField source="popularbrand" label="Popular Brand" />
-      <TextField source="link" label="Link" />
-      <TextField source="purpose" label="Purpose" />
-      <TextField source="advantages" label="Advantages" />
-      <TextField source="howtouse" label="How To Use" />
-      <EditButton />
-      <DeleteButton />
-    </Datagrid>
-  </List>
-);
-
-// Resource Create: Supports File Upload
-const ResourceCreate = () => (
-  <Create>
-    <SimpleForm>
-      <TextInput source="name" label="Resource Name" />
-      <TextInput source="description" label="Description" />
-      <FileInput source="image" label="Upload Image" accept="image/*">
-        <FileField source="src" title="title" />
-      </FileInput>
-      <TextInput source="popularbrand" label="Popular Brand" />
-      <TextInput source="link" label="Link" />
-      <TextInput source="purpose" label="Purpose" />
-      <TextInput source="advantages" label="Adavantages" />
-      <TextInput source="howtouse" label="How To Use" />
-    </SimpleForm>
-  </Create>
-);
-
-const ResourceEdit = () => (
-  <Edit>
-    <SimpleForm>
-      <TextInput source="name" label="Resource Name" />
-      <TextInput source="description" label="Description" />
-      <FileInput source="image" label="Upload New Image" accept="image/*">
-        <FileField source="src" title="title" />
-      </FileInput>
-      <TextInput source="popularbrand" label="Popular Brand" />
-      <TextInput source="link" label="Link" />
-      <TextInput source="purpose" label="Purpose" />
-      <TextInput source="advantages" label="Adavantages" />
-      <TextField source="howtouse" label="How To Use" />
-    </SimpleForm>
-  </Edit>
-);
-
+/**
+ * Resources are mounted per role (the `permissions` value comes from
+ * authProvider.getPermissions), so a moderator never gets admin-only routes.
+ */
 const App = () => (
-  <Admin dataProvider={customDataProvider} authProvider={authProvider} dashboard={Dashboard}>
-    <Resource name="contacts" list={ContactList} />
-    <Resource name="users" list={UserList} />
-    <Resource name="schemes" list={SchemeList} create={SchemeCreate} edit={SchemeEdit} />
-    <Resource name="resources" list={ResourceList} create={ResourceCreate} edit={ResourceEdit} />
-    <Resource name="Analytic" list={AnalyticsDashboard} />
+  <Admin
+    title="AgroSence Admin"
+    dataProvider={dataProvider}
+    authProvider={authProvider}
+    dashboard={Dashboard}
+    layout={Layout}
+    loginPage={LoginPage}
+    theme={lightTheme}
+    darkTheme={darkTheme}
+    defaultTheme="light"
+    requireAuth
+    disableTelemetry
+  >
+    {(role: string | null) => [
+      <Resource key="schemes" name="schemes" list={SchemeList} create={SchemeCreate} edit={SchemeEdit} icon={SchemeIcon} />,
+      <Resource key="resources" name="resources" list={ResourceList} create={ResourceCreate} edit={ResourceEdit} icon={ResourceIcon} />,
+      <Resource key="contacts" name="contacts" list={ContactList} show={ContactShow} icon={MailIcon} />,
+      <Resource key="crops" name="crops" list={CropList} show={CropShow} icon={GrassIcon} />,
+      <Resource key="orders" name="orders" list={OrderList} show={OrderShow} icon={OrdersIcon} />,
+      <Resource
+        key="users"
+        name="users"
+        list={UserList}
+        show={UserShow}
+        edit={role === "admin" ? UserEdit : undefined}
+        icon={PeopleIcon}
+      />,
+      role === "admin" ? (
+        <Resource key="audit-logs" name="audit-logs" list={AuditLogList} show={AuditLogShow} icon={AuditIcon} options={{ label: "Audit logs" }} />
+      ) : null,
+      <CustomRoutes key="custom">
+        <Route path="/profile" element={<Profile />} />
+      </CustomRoutes>,
+    ]}
   </Admin>
 );
 

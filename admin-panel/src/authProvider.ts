@@ -1,42 +1,82 @@
-import { AuthProvider } from 'react-admin';
+import type { AuthProvider } from "react-admin";
+import { PANEL_ROLES } from "./api/config";
+import { ApiError, request, session, tokens } from "./api/http";
+import type { ApiUser } from "./api/types";
 
-// Define the authProvider
+interface LoginResult {
+  user: ApiUser;
+  accessToken: string;
+  refreshToken: string;
+}
+
 const authProvider: AuthProvider = {
-  // Login function: Authenticate the user
-  login: ({ username, password }) => {
-    if (username === 'admin' && password === 'admin123') {
-      // If credentials match, return a successful login
-      localStorage.setItem('auth', 'true');
-      return Promise.resolve();
+  async login({ identifier, password }: { identifier: string; password: string }) {
+    const { data } = await request<LoginResult>("/auth/login", {
+      method: "POST",
+      json: { identifier: identifier?.trim(), password },
+      auth: false,
+    });
+    if (!PANEL_ROLES.includes(data.user.role)) {
+      // Never keep a session for a non-staff account.
+      tokens.set(data.accessToken, data.refreshToken);
+      await request("/auth/logout", {
+        method: "POST",
+        json: { refreshToken: data.refreshToken },
+      }).catch(() => undefined);
+      tokens.clear();
+      throw new Error("This account does not have admin panel access.");
     }
-    // If credentials don't match, reject the login attempt
-    return Promise.reject('Invalid username or password');
+    tokens.set(data.accessToken, data.refreshToken);
+    session.setUser(data.user);
   },
 
-  // Logout function: Clear authentication data
-  logout: () => {
-    localStorage.removeItem('auth');
-    return Promise.resolve();
+  async logout() {
+    const refreshToken = tokens.refresh;
+    if (refreshToken && tokens.access) {
+      await request("/auth/logout", { method: "POST", json: { refreshToken } }).catch(() => undefined);
+    }
+    tokens.clear();
   },
 
-  // Check if the user is authenticated
-  checkAuth: () => {
-    return localStorage.getItem('auth') ? Promise.resolve() : Promise.reject();
+  async checkAuth() {
+    const user = session.getUser();
+    if (!tokens.access || !tokens.refresh || !user || !PANEL_ROLES.includes(user.role)) {
+      tokens.clear();
+      throw new Error("Not authenticated");
+    }
   },
 
-  // Check user permissions (optional for more advanced control)
-  checkError: (error) => {
-    // Handle errors from the API here
-    return Promise.resolve();
+  async checkError(error: unknown) {
+    const status = error instanceof ApiError ? error.status : (error as { status?: number })?.status;
+    if (status === 401) {
+      tokens.clear();
+      throw new Error("Session expired");
+    }
+    // 403 and everything else: stay signed in; the UI shows the message.
   },
 
-  // Get user identity (optional)
-  getIdentity: () => {
-    return Promise.resolve({ id: 'admin', fullName: 'Admin User' });
+  async getPermissions() {
+    return session.getUser()?.role ?? null;
   },
 
-  // Get user permissions (optional)
-  getPermissions: () => Promise.resolve(),
+  async getIdentity() {
+    const user = session.getUser();
+    if (!user) throw new Error("Not authenticated");
+    return {
+      id: user.id,
+      fullName: user.name,
+      avatar: user.avatar,
+      email: user.email,
+      role: user.role,
+    };
+  },
+};
+
+/** Re-reads the signed-in user from the server and updates the local session. */
+export const refreshIdentity = async (): Promise<ApiUser> => {
+  const { data } = await request<ApiUser>("/auth/me");
+  session.setUser(data);
+  return data;
 };
 
 export default authProvider;
