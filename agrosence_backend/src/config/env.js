@@ -68,7 +68,7 @@ const env = {
     apiSecret: process.env.CLOUDINARY_API_SECRET,
     url: process.env.CLOUDINARY_URL,
   },
-  gemini: { apiKey: process.env.GEMINI_API_KEY, model: process.env.GEMINI_MODEL || "gemini-2.0-flash" },
+  gemini: { apiKey: process.env.GEMINI_API_KEY, model: process.env.GEMINI_MODEL || "gemini-2.5-flash" },
   plantId: { apiKey: process.env.PLANT_ID_API_KEY },
   mail: {
     smtpHost: process.env.SMTP_HOST || "smtp.gmail.com",

@@ -12,13 +12,13 @@ async function getChatAnswer(message) {
       {
         systemInstruction: { parts: [{ text: "You are AgroSence, a concise assistant for Indian farmers. Answer agriculture, farming, crop, market and government-scheme questions in under 120 words. If the question is unrelated to agriculture, politely reply that you can only help with agriculture-related queries." }] },
         contents: [{ parts: [{ text: message }] }],
-        generationConfig: { maxOutputTokens: 300 },
+        generationConfig: { maxOutputTokens: 800, temperature: 0.4, thinkingConfig: { thinkingBudget: 0 } },
       },
       { headers: { "Content-Type": "application/json", "x-goog-api-key": env.gemini.apiKey }, timeout: 20000 }
     );
     return data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm not sure how to respond to that.";
   } catch (err) {
-    console.error("[gemini] error:", err.response?.status || err.message);
+    console.error("[gemini] error:", err.response?.status || err.message, err.response?.data?.error?.message || "");
     throw ApiError.unavailable("The assistant is temporarily unavailable");
   }
 }
