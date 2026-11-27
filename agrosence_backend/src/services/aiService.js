@@ -4,23 +4,38 @@ const env = require("../config/env");
 const ApiError = require("../utils/ApiError");
 
 
+const SYSTEM_PROMPT =
+  "You are AgroSence, a concise assistant for Indian farmers. Answer agriculture, farming, crop, market and government-scheme questions in under 120 words. If the question is unrelated to agriculture, politely reply that you can only help with agriculture-related queries.";
+
+// Models are retired regularly (2.0 flash is gone, 2.5 flash shuts down 2026-12-01). Try the configured one first, then current fallbacks.
+const modelChain = () => [...new Set([env.gemini.model, "gemini-4-hydrogen", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite"].filter(Boolean))];
+
+async function callGemini(model, message) {
+  const { data } = await axios.post(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    {
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: [{ parts: [{ text: message }] }],
+      generationConfig: { maxOutputTokens: 800 },
+    },
+    { headers: { "Content-Type": "application/json", "x-goog-api-key": env.gemini.apiKey }, timeout: 20000 }
+  );
+  return data.candidates?.[0]?.content?.parts?.map((p) => p.text).filter(Boolean).join("") || "I'm not sure how to respond to that.";
+}
+
 async function getChatAnswer(message) {
   if (!env.gemini.apiKey) throw ApiError.unavailable("The assistant is not configured on the server");
-  try {
-    const { data } = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/${env.gemini.model}:generateContent`,
-      {
-        systemInstruction: { parts: [{ text: "You are AgroSence, a concise assistant for Indian farmers. Answer agriculture, farming, crop, market and government-scheme questions in under 120 words. If the question is unrelated to agriculture, politely reply that you can only help with agriculture-related queries." }] },
-        contents: [{ parts: [{ text: message }] }],
-        generationConfig: { maxOutputTokens: 800, temperature: 0.4, thinkingConfig: { thinkingBudget: 0 } },
-      },
-      { headers: { "Content-Type": "application/json", "x-goog-api-key": env.gemini.apiKey }, timeout: 20000 }
-    );
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm not sure how to respond to that.";
-  } catch (err) {
-    console.error("[gemini] error:", err.response?.status || err.message, err.response?.data?.error?.message || "");
-    throw ApiError.unavailable("The assistant is temporarily unavailable");
+  for (const model of modelChain()) {
+    try {
+      return await callGemini(model, message);
+    } catch (err) {
+      const status = err.response?.status;
+      console.error(`[gemini] ${model} failed:`, status || err.message, err.response?.data?.error?.message || "");
+      // Only move on to the next model when this one is unavailable to the key; auth/quota problems won't be fixed by another model.
+      if (status !== 404 && status !== 403 && status !== 400) break;
+    }
   }
+  throw ApiError.unavailable("The assistant is temporarily unavailable");
 }
 
 async function wikiDescription(title) {
