@@ -310,3 +310,20 @@ test("L6: suspended sellers' crops are hidden from the marketplace and cannot be
   await Users().updateOne({ _id: seller.user.id }, { $set: { active: true } });
   assert.equal((await list()).length, 1);
 });
+
+// ---------------- schemes: legacy state formats ----------------
+test("schemes: state filter matches legacy slug/title-case values and returns canonical state", async () => {
+  const Scheme = require("../src/models/Scheme");
+  const base = { description: "d", eligibility: "e", benefits: "b", applyLink: "https://example.gov.in" };
+  await Scheme.create([
+    { ...base, name: "S1", state: "gujarat" },
+    { ...base, name: "S2", state: "andhra-pradesh" },
+    { ...base, name: "S3", state: "all-states" },
+    { ...base, name: "S4", state: "Bihar" },
+  ]);
+  const g = await h.request().get("/api/schemes?state=Gujarat").expect(200);
+  assert.deepEqual(g.body.data.map((x) => x.name).sort(), ["S1", "S3"]);
+  assert.ok(g.body.data.every((x) => ["Gujarat", "All States"].includes(x.state)));
+  const a = await h.request().get("/api/schemes?state=Andhra%20Pradesh").expect(200);
+  assert.ok(a.body.data.some((x) => x.name === "S2" && x.state === "Andhra Pradesh"));
+});

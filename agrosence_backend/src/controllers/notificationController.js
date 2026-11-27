@@ -12,7 +12,15 @@ exports.list = asyncHandler(async (req, res) => {
   const p = parsePage(req.query, { allowedSort: ["createdAt"] });
   const filter = mineFilter(req.user._id);
   const [{ items, meta }, unread] = await Promise.all([
-    paginate(Notification, filter, p),
+    paginate(Notification, filter, p, {
+      populate: { path: "cropId", select: "cropName" },
+      map: (n) => {
+        const crop = n.cropId && typeof n.cropId === "object" ? n.cropId : null;
+        // Legacy notifications were saved with the literal text "undefined" instead of the crop name.
+        const msg = /undefined/i.test(n.message || "") ? `You received a new order request for ${crop?.cropName || "one of your crops"}` : n.message;
+        return { ...n, message: msg, cropName: crop?.cropName, cropId: crop?._id || n.cropId };
+      },
+    }),
     Notification.countDocuments({ $and: [filter, { status: "unread" }] }),
   ]);
   paginated(res, items, { ...meta, unread });

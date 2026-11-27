@@ -20,28 +20,30 @@ const searchOr = (q, fields) => {
 };
 
 // ---------- schemes ----------
+const { normalizeState, stateRegex, ALL: ALL_STATES } = require("../utils/state");
+const withState = (s) => ({ ...s, state: normalizeState(s.state) });
 exports.listSchemes = asyncHandler(async (req, res) => {
   const q = req.valid.query;
   const filter = {};
-  if (q.state) filter.state = { $in: [q.state, "All States"] };
+  if (q.state) filter.$and = [{ $or: [{ state: stateRegex(q.state) }, { state: stateRegex(ALL_STATES) }] }];
   if (q.q) filter.$or = searchOr(q.q, ["name", "description", "benefits"]);
   const { items, meta } = await paginate(Scheme, filter, parsePage(q, { allowedSort: ["createdAt", "name"] }));
   cache(res);
-  paginated(res, items, meta);
+  paginated(res, items.map(withState), meta);
 });
 exports.getScheme = asyncHandler(async (req, res) => {
   const s = await Scheme.findById(req.params.id).lean();
   if (!s) throw ApiError.notFound("Scheme not found");
   cache(res);
-  ok(res, s);
+  ok(res, withState(s));
 });
 exports.createScheme = asyncHandler(async (req, res) => {
-  const s = await Scheme.create(req.body);
+  const s = await Scheme.create({ ...req.body, state: normalizeState(req.body.state) });
   await audit(req, "scheme.create", "Scheme", s._id, { name: s.name });
   created(res, s);
 });
 exports.updateScheme = asyncHandler(async (req, res) => {
-  const s = await Scheme.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true, runValidators: true }).lean();
+  const s = await Scheme.findByIdAndUpdate(req.params.id, { $set: "state" in req.body ? { ...req.body, state: normalizeState(req.body.state) } : req.body }, { new: true, runValidators: true }).lean();
   if (!s) throw ApiError.notFound("Scheme not found");
   await audit(req, "scheme.update", "Scheme", s._id, { fields: Object.keys(req.body) });
   ok(res, s);
