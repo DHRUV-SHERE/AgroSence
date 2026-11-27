@@ -327,3 +327,44 @@ test("schemes: state filter matches legacy slug/title-case values and returns ca
   const a = await h.request().get("/api/schemes?state=Andhra%20Pradesh").expect(200);
   assert.ok(a.body.data.some((x) => x.name === "S2" && x.state === "Andhra Pradesh"));
 });
+
+// ---------------- chatbot: Gemini interactions parsing + fallback ----------------
+test("chatbot: parses Interactions API output and falls back to generateContent / next model", async () => {
+  const axios = require("axios");
+  const env = require("../src/config/env");
+  const ai = require("../src/services/aiService");
+  const orig = axios.post;
+  const prevKey = env.gemini.apiKey;
+  env.gemini.apiKey = "test-key";
+  const calls = [];
+  try {
+    axios.post = async (url) => {
+      calls.push(url);
+      if (url.endsWith("/interactions") && calls.length === 1)
+        return { data: { steps: [{ type: "model_output", content: [{ type: "text", text: "Sow wheat in November." }] }] } };
+      const e = new Error("nf");
+      e.response = { status: 404, data: { error: { message: "model not found" } } };
+      throw e;
+    };
+    assert.equal(await ai.getChatAnswer("when to sow wheat"), "Sow wheat in November.");
+    calls.length = 0;
+    axios.post = async (url) => {
+      calls.push(url);
+      if (url.includes("gemini-3.5-flash-lite") && url.includes(":generateContent"))
+        return { data: { candidates: [{ content: { parts: [{ text: "fallback ok" }] } }] } };
+      const e = new Error("nf");
+      e.response = { status: 404, data: {} };
+      throw e;
+    };
+    assert.equal(await ai.getChatAnswer("hi"), "fallback ok");
+    axios.post = async () => {
+      const e = new Error("bad key");
+      e.response = { status: 429, data: {} };
+      throw e;
+    };
+    await assert.rejects(() => ai.getChatAnswer("hi"), /temporarily unavailable/);
+  } finally {
+    axios.post = orig;
+    env.gemini.apiKey = prevKey;
+  }
+});

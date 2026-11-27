@@ -10,17 +10,49 @@ const SYSTEM_PROMPT =
 // Models are retired regularly (2.0 flash is gone, 2.5 flash shuts down 2026-12-01). Try the configured one first, then current fallbacks.
 const modelChain = () => [...new Set([env.gemini.model, "gemini-4-hydrogen", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite"].filter(Boolean))];
 
-async function callGemini(model, message) {
+const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
+const headers = () => ({ "Content-Type": "application/json", "x-goog-api-key": env.gemini.apiKey });
+const NO_ANSWER = "I'm not sure how to respond to that.";
+
+/** Interactions API (current): text is in steps[type=model_output].content[type=text].text */
+async function callInteractions(model, message) {
   const { data } = await axios.post(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    `${GEMINI_BASE}/interactions`,
+    { model, system_instruction: SYSTEM_PROMPT, input: message, generation_config: { max_output_tokens: 800 }, store: false },
+    { headers: { ...headers(), "Api-Revision": "2026-05-20" }, timeout: 20000 }
+  );
+  const text = (data.steps || [])
+    .filter((st) => st.type === "model_output")
+    .flatMap((st) => st.content || [])
+    .filter((c) => c.type === "text" && c.text)
+    .map((c) => c.text)
+    .join("");
+  return text || data.output_text || NO_ANSWER;
+}
+
+/** Legacy generateContent API (still supported by Google): used as a fallback. */
+async function callGenerateContent(model, message) {
+  const { data } = await axios.post(
+    `${GEMINI_BASE}/models/${model}:generateContent`,
     {
       system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
       contents: [{ parts: [{ text: message }] }],
       generationConfig: { maxOutputTokens: 800 },
     },
-    { headers: { "Content-Type": "application/json", "x-goog-api-key": env.gemini.apiKey }, timeout: 20000 }
+    { headers: headers(), timeout: 20000 }
   );
-  return data.candidates?.[0]?.content?.parts?.map((p) => p.text).filter(Boolean).join("") || "I'm not sure how to respond to that.";
+  return data.candidates?.[0]?.content?.parts?.map((p) => p.text).filter(Boolean).join("") || NO_ANSWER;
+}
+
+async function callGemini(model, message) {
+  try {
+    return await callInteractions(model, message);
+  } catch (err) {
+    const st = err.response?.status;
+    console.error(`[gemini] interactions ${model} failed:`, st || err.message, err.response?.data?.error?.message || "");
+    if (st && st !== 400 && st !== 404) throw err; // auth/quota/server errors won't change with another endpoint
+    return callGenerateContent(model, message);
+  }
 }
 
 async function getChatAnswer(message) {
