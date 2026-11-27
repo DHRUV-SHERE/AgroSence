@@ -172,3 +172,12 @@
   .ag-chat { inset: 0; width: 100%; height: 100dvh; border-radius: 0; border: 0; }
   .ag-chat__fab span { display: none; } .ag-chat__fab { padding: 0 var(--s-4); }
 }
+
+/* Chat answers rendered from Markdown */
+.ag-md > * + * { margin-top: var(--s-2); }
+.ag-md p { margin: 0; }
+.ag-md ul, .ag-md ol { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.25rem; }
+.ag-md ul { list-style: disc; } .ag-md ol { list-style: decimal; }
+.ag-md__h { font-weight: 700; }
+.ag-md code { padding: 0 0.3em; border-radius: 4px; background: var(--paper-2); font-size: 0.9em; }
+.ag-msg--bot { white-space: normal; }

@@ -4,6 +4,7 @@
  * Accessibility: dialog landmark, aria-live log, Escape closes, focus moves to input on open and back to the
  * launcher on close, full-screen on phones.
  */
+import ChatMarkdown from './ChatMarkdown'
 import { useEffect, useRef, useState } from 'react'
 import { LuBot, LuMessageCircle, LuSend, LuX } from 'react-icons/lu'
 import { http } from '../../lib/api'
@@ -90,7 +91,7 @@ export default function Chatbot() {
 
       <div className="ag-chat__log" ref={logRef} role="log" aria-live="polite" aria-label="Conversation">
         {messages.map((m) => (
-          <div key={m.id} className={`ag-msg ag-msg--${m.role}${m.error ? ' ag-msg--error' : ''}`}>{m.text}</div>
+          <div key={m.id} className={`ag-msg ag-msg--${m.role}${m.error ? ' ag-msg--error' : ''}`}>{m.role === 'bot' && !m.error ? <ChatMarkdown text={m.text} /> : m.text}</div>
         ))}
         {busy && <div className="ag-msg ag-msg--bot" role="status" aria-label="AgroBot is typing"><span className="ag-typing"><i /><i /><i /></span></div>}
       </div>

@@ -5,7 +5,7 @@ const ApiError = require("../utils/ApiError");
 
 
 const SYSTEM_PROMPT =
-  "You are AgroSence, a concise assistant for Indian farmers. Answer agriculture, farming, crop, market and government-scheme questions in under 120 words. If the question is unrelated to agriculture, politely reply that you can only help with agriculture-related queries.";
+  "You are AgroSence, a concise assistant for Indian farmers. Answer agriculture, farming, crop, market and government-scheme questions in under 120 words. Use plain, simple language and short bullet points (use '- ' bullets); avoid tables and headings. If you are not sure of exact eligibility rules, amounts or dates for a scheme, say so and point to the official website instead of guessing. If the question is unrelated to agriculture, politely reply that you can only help with agriculture-related queries.";
 
 // Models are retired regularly (2.0 flash is gone, 2.5 flash shuts down 2026-12-01). Try the configured one first, then current fallbacks.
 const modelChain = () => [...new Set([env.gemini.model, "gemini-4-hydrogen", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite"].filter(Boolean))];
