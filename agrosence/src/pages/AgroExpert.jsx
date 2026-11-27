@@ -1,232 +1,94 @@
-import React, { useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  InputGroup,
-  Card,
-  Badge,
-} from "react-bootstrap";
-import { FiSearch, FiStar } from "react-icons/fi";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+/** Expert guidance: searchable directory of agricultural experts plus an ask-an-expert form that posts to POST /support. */
+import { useMemo, useRef, useState } from 'react'
+import { LuMail, LuMapPin, LuMessageSquareText, LuPhone, LuSearchX, LuStar } from 'react-icons/lu'
+import { useDebouncedValue } from '../hooks/useDebouncedValue'
+import { EXPERTS } from '../components/content/experts'
+import SupportForm from '../components/content/SupportForm'
+import { Badge, Button, Card, EmptyState, Input, Select } from '../components/ui'
+import '../styles/pages-content.css'
 
-const AgriculturalExperts = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+const SPECIALTIES = [...new Set(EXPERTS.flatMap((e) => e.specialties))].sort()
 
-  const experts = [
-    {
-      id: 1,
-      name: "Dr. A. K. Singh",
-      title: "Vice Chancellor, Bihar Agricultural University",
-      rating: 4.8,
-      reviews: 120,
-      specialties: ["Crop Science", "Soil Health"],
-      email: "vc@bau.edu.in",
-      phone: "+91-612-2223962",
-      address: "Sabour, Bhagalpur, Bihar – 813210",
-    },
-    {
-      id: 2,
-      name: "Dr. P. L. Gautam",
-      title: "Vice Chancellor, Chhattisgarh Kamdhenu Vishwavidyalaya",
-      rating: 4.7,
-      reviews: 98,
-      specialties: ["Animal Husbandry", "Veterinary Science"],
-      email: "vc@cgkv.ac.in",
-      phone: "+91-771-2253155",
-      address: "Anjora, Durg, Chhattisgarh – 491001",
-    },
-    {
-      id: 3,
-      name: "Dr. S. K. Chaudhari",
-      title: "Deputy Director General (NRM), ICAR",
-      rating: 4.9,
-      reviews: 150,
-      specialties: ["Natural Resource Management", "Soil Science"],
-      email: "ddgnrm.icar@nic.in",
-      phone: "+91-11-23382373",
-      address: "Krishi Bhavan, New Delhi – 110001",
-    },
-    {
-      id: 4,
-      name: "Dr. K. R. Kranthi",
-      title: "Director, Central Institute for Cotton Research",
-      rating: 4.6,
-      reviews: 110,
-      specialties: ["Cotton Research", "Pest Management"],
-      email: "director.cicr@icar.gov.in",
-      phone: "+91-712-2500245",
-      address: "Nagpur, Maharashtra – 440010",
-    },
-    {
-      id: 5,
-      name: "Dr. R. S. Paroda",
-      title: "Former Director General, ICAR",
-      rating: 4.8,
-      reviews: 200,
-      specialties: ["Plant Breeding", "Genetic Resources"],
-      email: "rsparoda@icar.org.in",
-      phone: "+91-11-25843301",
-      address: "New Delhi – 110012",
-    },
-    {
-      id: 6,
-      name: "Dr. M. C. Varshneya",
-      title: "Vice Chancellor, Anand Agricultural University",
-      rating: 4.7,
-      reviews: 130,
-      specialties: ["Dairy Science", "Animal Nutrition"],
-      email: "vc@aau.in",
-      phone: "+91-2692-261310",
-      address: "Anand, Gujarat – 388110",
-    },
-    {
-      id: 7,
-      name: "Dr. R. K. Mittal",
-      title: "Vice Chancellor, Sardar Vallabhbhai Patel University of Agriculture and Technology",
-      rating: 4.5,
-      reviews: 90,
-      specialties: ["Agricultural Engineering", "Farm Machinery"],
-      email: "vc@svpuat.edu.in",
-      phone: "+91-121-2888502",
-      address: "Meerut, Uttar Pradesh – 250110",
-    },
-    {
-      id: 8,
-      name: "Dr. S. Ayyappan",
-      title: "Former Director General, ICAR",
-      rating: 4.9,
-      reviews: 210,
-      specialties: ["Fisheries Science", "Aquaculture"],
-      email: "sayyappan@icar.org.in",
-      phone: "+91-11-25843301",
-      address: "New Delhi – 110012",
-    },
-    {
-      id: 9,
-      name: "Dr. H. P. Singh",
-      title: "Chairman, Coconut Development Board",
-      rating: 4.6,
-      reviews: 100,
-      specialties: ["Horticulture", "Plantation Crops"],
-      email: "chairman@coconutboard.gov.in",
-      phone: "+91-484-2376265",
-      address: "Kochi, Kerala – 682011",
-    },
-    {
-      id: 10,
-      name: "Dr. R. R. Hanchinal",
-      title: "Chairperson, Protection of Plant Varieties and Farmers' Rights Authority",
-      rating: 4.7,
-      reviews: 115,
-      specialties: ["Plant Variety Protection", "Seed Technology"],
-      email: "chairperson@plantauthority.gov.in",
-      phone: "+91-11-25848127",
-      address: "New Delhi – 110012",
-    },
-    // Additional experts from other states and union territories can be added here
-  ];
- const filteredExperts = experts.filter((expert) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      expert.name.toLowerCase().includes(query) ||
-      expert.title.toLowerCase().includes(query) ||
-      expert.address.toLowerCase().includes(query) ||
-      expert.specialties.some((spec) =>
-        spec.toLowerCase().includes(query)
-      )
-    );
-  });
+export default function AgroExpert() {
+  const [query, setQuery] = useState('')
+  const [specialty, setSpecialty] = useState('')
+  const [target, setTarget] = useState('')
+  const formRef = useRef(null)
+  const q = useDebouncedValue(query).trim().toLowerCase()
+
+  const shown = useMemo(() => EXPERTS.filter((e) => {
+    if (specialty && !e.specialties.includes(specialty)) return false
+    return !q || [e.name, e.title, e.address, ...e.specialties].some((t) => t.toLowerCase().includes(q))
+  }), [q, specialty])
+
+  const chosen = EXPERTS.find((e) => String(e.id) === target)
+  const ask = (id) => {
+    setTarget(String(id))
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    formRef.current?.querySelector('textarea')?.focus({ preventScroll: true })
+  }
 
   return (
-    <div>
-      <Header />
-      <Container fluid className="py-5" style={{ backgroundColor: "#f8f9fa" }}>
-        <Row className="text-center mb-5">
-          <Col>
-            <h2 className="mb-3">Connect with Agricultural Experts</h2>
-            <p className="text-muted mb-4">
-              Get personalized advice and solutions from our network of
-              qualified agricultural professionals.
-            </p>
-            <Form className="d-flex justify-content-center">
-              <InputGroup className="mb-3" style={{ maxWidth: "600px" }}>
-                <InputGroup.Text className="bg-white border-end-0">
-                  <FiSearch className="text-muted" />
-                </InputGroup.Text>
-                <Form.Control
-                  placeholder="Search by name, title, specialty, or address..."
-                  aria-label="Search experts"
-                  className="border-start-0"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </InputGroup>
-            </Form>
-          </Col>
-        </Row>
+    <>
+      <header className="ag-pagehead">
+        <div>
+          <h1>Advice from <span className="ag-em">people who know</span></h1>
+          <p>Find an agricultural expert by name, subject or place, then send your question. Describe your crop, soil and problem so the answer fits your field.</p>
+        </div>
+      </header>
 
-        <Container>
-          <Row className="mb-4 align-items-center">
-            <Col>
-              <h3 className="mb-0">Our Experts</h3>
-            </Col>
-          </Row>
+      <div className="ag-experts">
+        <section aria-labelledby="experts-h">
+          <h2 id="experts-h" className="ag-sr-only">Experts</h2>
+          <div className="ag-toolbar">
+            <Input wrapperClassName="ag-toolbar__search" label="Search experts" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Name, subject or place" autoComplete="off" />
+            <Select wrapperClassName="ag-toolbar__select" label="Subject" value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="All subjects" options={SPECIALTIES} />
+          </div>
+          <p className="ag-muted ag-toolbar__count" role="status" aria-live="polite">{shown.length} {shown.length === 1 ? 'expert' : 'experts'}</p>
 
-          {filteredExperts.length > 0 ? (
-            filteredExperts.map((expert) => (
-              <Card key={expert.id} className="mb-4 border-0 shadow-sm">
-                <Card.Body className="d-flex flex-column h-100">
-                  <div className="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                      <h4 className="mb-1">{expert.name}</h4>
-                      <p className="text-muted mb-2">{expert.title}</p>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <FiStar className="text-warning me-1" />
-                      <span className="fw-bold me-1">{expert.rating}</span>
-                      <span className="text-muted">({expert.reviews})</span>
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    {expert.specialties.map((specialty, index) => (
-                      <Badge
-                        key={index}
-                        bg="light"
-                        text="dark"
-                        className="me-2 mb-2 py-2 px-3 rounded-pill"
-                        style={{ backgroundColor: "#f0f0f0" }}
-                      >
-                        {specialty}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <div className="text-muted">
-                    <p>
-                      <strong>Email:</strong> {expert.email}
-                    </p>
-                    <p>
-                      <strong>Phone:</strong> {expert.phone}
-                    </p>
-                    <p>
-                      <strong>Address:</strong> {expert.address}
-                    </p>
-                  </div>
-                </Card.Body>
-              </Card>
-            ))
+          {shown.length === 0 ? (
+            <EmptyState icon={LuSearchX} title="No expert matches" message="Try another subject or a shorter search." action={<Button onClick={() => { setQuery(''); setSpecialty('') }}>Clear filters</Button>} />
           ) : (
-            <p className="text-center text-muted">No experts found.</p>
+            <ul className="ag-expertlist">
+              {shown.map((e) => (
+                <li key={e.id} className="ag-expert">
+                  <div className="ag-expert__head">
+                    <div>
+                      <h3>{e.name}</h3>
+                      <p>{e.title}</p>
+                    </div>
+                    <span className="ag-expert__rating ag-num" aria-label={`Rated ${e.rating} from ${e.reviews} reviews`}>
+                      <LuStar aria-hidden="true" /> {e.rating} <small>({e.reviews})</small>
+                    </span>
+                  </div>
+                  <div className="ag-expert__tags">{e.specialties.map((s) => <Badge key={s}>{s}</Badge>)}</div>
+                  <ul className="ag-expert__contact">
+                    <li><LuMail aria-hidden="true" /><a href={`mailto:${e.email}`}>{e.email}</a></li>
+                    <li><LuPhone aria-hidden="true" /><a href={`tel:${e.phone.replace(/[^\d+]/g, '')}`}>{e.phone}</a></li>
+                    <li><LuMapPin aria-hidden="true" /><span>{e.address}</span></li>
+                  </ul>
+                  <div><Button size="sm" icon={<LuMessageSquareText aria-hidden="true" />} onClick={() => ask(e.id)}>Ask this expert<span className="ag-sr-only">: {e.name}</span></Button></div>
+                </li>
+              ))}
+            </ul>
           )}
-        </Container>
-      </Container>
-      <Footer />
-    </div>
-  );
-};
+        </section>
 
-export default AgriculturalExperts;
+        <aside className="ag-askbox" ref={formRef} aria-labelledby="ask-h">
+          <Card>
+            <h2 id="ask-h">Ask an expert</h2>
+            <p className="ag-muted">Your question reaches our support team, who pass it to the right expert and reply by email.</p>
+            <SupportForm
+              messageLabel="Your question"
+              placeholder="Which crop, which season, what are you seeing?"
+              submitLabel="Send question"
+              prefix={chosen ? `[Question for ${chosen.name}, ${chosen.email}]\n\n` : '[Expert advice request]\n\n'}
+            >
+              <Select label="Question for" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="Any expert" options={EXPERTS.map((x) => ({ value: String(x.id), label: x.name }))} />
+            </SupportForm>
+          </Card>
+        </aside>
+      </div>
+    </>
+  )
+}

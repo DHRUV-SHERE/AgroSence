@@ -1,133 +1,165 @@
-import React, { useState } from "react";
-import Navbar from "../components/Header";
-import Footer from "../components/Footer";
-import axios from "axios";
-import { resource } from "../resource";
+/**
+ * Crop detection (AppLayout). POST /crop-detect (multipart field "image") -> { scientificName, commonNames[], description, image|null }.
+ * 503 = identification service not configured, 404 = could not identify. Both get a plain-language message.
+ */
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { LuImagePlus, LuLeaf, LuRotateCcw, LuScanSearch } from 'react-icons/lu'
+import '../styles/pages-tools.css'
+import { http } from '../lib/api'
+import { Alert, Badge, Button, Card, Skeleton, SkeletonText } from '../components/ui'
+import { cx } from '../lib/cx'
+import sample from '../assets/Feature/Crop Detection.webp'
 
-function CropDetection() {
-  const [image, setImage] = useState(null);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+const MAX_MB = 5
+const TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-    setResult(null);
-  };
+function checkFile(file) {
+  if (!TYPES.includes(file.type)) return 'Use a JPG, PNG or WebP photo.'
+  if (file.size > MAX_MB * 1024 * 1024) return `That photo is ${(file.size / 1048576).toFixed(1)} MB. Choose one under ${MAX_MB} MB.`
+  return ''
+}
 
-  const handleUpload = async () => {
-    if (!image) return alert("Please select an image.");
+function friendly(e) {
+  if (e.status === 503) return { tone: 'info', text: 'Plant identification is not switched on for this server yet. Your photo was not saved. Please try again later.' }
+  if (e.status === 404) return { tone: 'info', text: 'We could not tell what this plant is. Try a closer, well-lit photo of one leaf, flower or fruit.' }
+  if (e.status === 413) return { tone: 'danger', text: `That photo is too large. Choose one under ${MAX_MB} MB.` }
+  if (e.status === 429) return { tone: 'danger', text: 'You have checked a lot of photos. Please wait a little and try again.' }
+  return { tone: 'danger', text: e.message }
+}
 
-    const formData = new FormData();
-    formData.append("image", image);
+export default function CropDetection() {
+  const [file, setFile] = useState(null)
+  const [preview, setPreview] = useState('')
+  const [fileError, setFileError] = useState('')
+  const [drag, setDrag] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState(null)
+  const [problem, setProblem] = useState(null)
+  const inputRef = useRef(null)
 
-    setLoading(true);
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview) }, [preview])
+
+  const pick = useCallback((f) => {
+    if (!f) return
+    const err = checkFile(f)
+    setResult(null); setProblem(null); setFileError(err)
+    if (err) { setFile(null); setPreview(''); return }
+    setFile(f)
+    setPreview(URL.createObjectURL(f))
+  }, [])
+
+  const reset = () => {
+    setFile(null); setPreview(''); setResult(null); setProblem(null); setFileError('')
+    if (inputRef.current) inputRef.current.value = ''
+  }
+
+  const detect = async () => {
+    if (!file) { setFileError('Choose a photo first.'); return }
+    const body = new FormData()
+    body.append('image', file)
+    setBusy(true); setProblem(null); setResult(null)
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/crop-detect",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setResult(response.data);
-    } catch (error) {
-      console.error("Detection failed:", error);
-      alert("Crop detection failed. Please try another image.");
+      const { data } = await http.post('/crop-detect', body)
+      setResult(data)
+    } catch (e) {
+      setProblem(friendly(e))
     } finally {
-      setLoading(false);
+      setBusy(false)
     }
-  };
+  }
+
+  const names = Array.isArray(result?.commonNames) ? result.commonNames.filter(Boolean) : []
 
   return (
     <>
-      <Navbar />
-
-      <div className="container flex mt-2 flex-col lg:flex-row justify-center items-start gap-10 p-6 lg:p-16 bg-gradient-to-br from-green-50 to-green-100 min-h-screen">
-        {/* LEFT: Upload and Result */}
-        <div className="w-full lg:w-1/2 bg-white p-8 rounded-2xl shadow-xl">
-          <h2 className="text-3xl font-bold text-green-700 mb-4">
-            🌿 Crop Detection
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Upload an image of a crop or plant to detect its scientific and
-            local name along with a description.
-          </p>
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mb-4 block w-full border border-gray-300 p-2 rounded-lg"
-          />
-
-          <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="w-full py-2 bg-green-600 rounded-lg hover:bg-green-700 transition"
-          >
-            {loading ? "Detecting..." : "🔍 Detect Crop"}
-          </button>
-
-          {result && (
-            <div className="mt-8">
-              <img
-                src={result.image}
-                alt="Detected"
-                className="w-full h-60 object-cover rounded-xl border mb-4"
-              />
-              <h3 className="text-xl fw-bold font-semibold text-green-700">
-                🌱 Scientific Name:
-              </h3>
-              <h4 className="italic text-gray-800 mb-3">
-                {result.scientificName}
-              </h4>
-
-              {result.commonNames?.length > 0 && (
-                <>
-                  <h4 className="text-lg fw-bold font-medium text-blue-600">
-                    Local/Common Names:
-                  </h4>
-                  <h6 className="text-gray-700 mb-3">
-                    {result.commonNames.join(", ")}
-                  </h6>
-                </>
-              )}
-
-              <h4 className="text-lg fw-bold font-medium text-blue-600">
-                Description:
-              </h4>
-              <h6 className="text-gray-700">{result.description}</h6>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT: How It Works */}
-        <div className="w-full lg:w-1/2 p-6 bg-white rounded-2xl shadow-lg">
-          <img
-            src={resource.Aichatbot.src} // Replace with your image or illustration
-            alt="How it works"
-            className="mt-6 mb-6 srounded-xl w-25 h-25 p-5 shadow-md w-full"
-          />
-          <h3 className="text-2xl font-bold text-green-700 mb-4">
-            📘 How It Works
-          </h3>
-          <ul className="list-disc pl-5 space-y-2 text-gray-700">
-            <li>Choose or capture a clear image of a plant or crop.</li>
-            <li>Click the "Detect Crop" button to start identification.</li>
-            <li>Wait a few seconds while our AI analyzes your image.</li>
-            <li>
-              Get the plant’s scientific name, local names, and description
-              instantly!
-            </li>
-          </ul>
+      <div className="ag-pagehead">
+        <div>
+          <h1>Check a <span className="ag-em">plant</span></h1>
+          <p>Take or upload a clear photo. We tell you what it is and a little about it.</p>
         </div>
       </div>
 
-      <Footer />
-    </>
-  );
-}
+      <div className="ag-tool">
+        <Card as="section" aria-labelledby="cd-up">
+          <h2 id="cd-up" className="ag-card__title">Your photo</h2>
 
-export default CropDetection;
+          <label
+            className={cx('ag-drop', drag && 'is-drag', preview && 'has-img')}
+            onDragOver={(e) => { e.preventDefault(); setDrag(true) }}
+            onDragLeave={() => setDrag(false)}
+            onDrop={(e) => { e.preventDefault(); setDrag(false); pick(e.dataTransfer.files?.[0]) }}
+          >
+            <input
+              ref={inputRef}
+              className="ag-drop__input"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => pick(e.target.files?.[0])}
+              aria-describedby="cd-hint"
+              aria-invalid={fileError ? true : undefined}
+            />
+            {preview ? (
+              <>
+                <img src={preview} alt="Preview of the photo you chose" />
+                {busy && <span className="ag-drop__scan" aria-hidden="true" />}
+              </>
+            ) : (
+              <span className="ag-drop__empty">
+                <LuImagePlus aria-hidden="true" />
+                <strong>Drop a photo here or tap to choose</strong>
+                <span>On a phone this opens your camera and gallery.</span>
+              </span>
+            )}
+          </label>
+          <p id="cd-hint" className="ag-help ag-drop__hint">JPG, PNG or WebP, up to {MAX_MB} MB.{file ? ` ${file.name}` : ''}</p>
+          {fileError && <p className="ag-error" role="alert">{fileError}</p>}
+
+          <div className="ag-cluster" style={{ marginTop: 'var(--s-4)' }}>
+            <Button variant="primary" icon={<LuScanSearch aria-hidden="true" />} loading={busy} onClick={detect} disabled={!file}>
+              {busy ? 'Looking closely' : 'Identify plant'}
+            </Button>
+            {(file || result) && <Button variant="ghost" icon={<LuRotateCcw aria-hidden="true" />} onClick={reset} disabled={busy}>Start over</Button>}
+          </div>
+        </Card>
+
+        <section aria-labelledby="cd-res" aria-live="polite" className="ag-tool__result">
+          <h2 id="cd-res" className="ag-sr-only">Result</h2>
+          {busy && (
+            <Card aria-busy="true">
+              <Skeleton height={28} width="60%" />
+              <div style={{ margin: 'var(--s-4) 0' }}><Skeleton height={16} width="40%" /></div>
+              <SkeletonText lines={4} />
+            </Card>
+          )}
+          {!busy && problem && <Alert tone={problem.tone}>{problem.text}</Alert>}
+          {!busy && !result && (
+            <Card flat className="ag-howto">
+              <img src={sample} alt="" width="640" height="420" loading="lazy" decoding="async" />
+              <h3>How to get a good answer</h3>
+              <ol>
+                <li>Fill the frame with one leaf, flower or fruit.</li>
+                <li>Use daylight. Avoid shadows and blur.</li>
+                <li>Press Identify plant and wait a few seconds.</li>
+              </ol>
+              <p className="ag-muted">This is a guide, not a lab test. For disease or pest problems, ask an expert.</p>
+            </Card>
+          )}
+          {!busy && result && (
+            <Card as="article" className="ag-found">
+              {result.image && <img src={result.image} alt={`Reference of ${result.scientificName}`} width="640" height="360" loading="lazy" decoding="async" />}
+              <Badge tone="success"><LuLeaf aria-hidden="true" /> Identified</Badge>
+              <h3 className="ag-found__name">{result.scientificName || 'Unknown plant'}</h3>
+              {names.length > 0 && (
+                <p className="ag-found__names">
+                  <span className="ag-muted">Also called</span>{' '}
+                  {names.map((n) => <Badge key={n} tone="brand">{n}</Badge>)}
+                </p>
+              )}
+              {result.description && <p className="ag-found__desc">{result.description}</p>}
+            </Card>
+          )}
+        </section>
+      </div>
+    </>
+  )
+}

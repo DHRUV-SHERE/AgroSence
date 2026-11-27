@@ -1,89 +1,106 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import Home from "../pages/Home";
-import About from "../pages/About";
-import Contact from "../pages/Contact";
-import Feature from "../pages/Feature";
-import Setting from "../pages/Setting";
-import Dashboard from "../pages/Dashboard";
-import LoginPage from "../pages/Login";
-import SignupPage from "../pages/Signup";
-import Chatbot from "../components/Chatbot";
-import Products from "../pages/Product";
-import OrderHistory from "../pages/OrderHistory";
-import GovSchemes from "../pages/GovScheme";
-import MarketAccess from "../pages/MarketAccess";
-import StateSchemes from "../pages/StateWiseScheme";
-import ResourcesPage from "../pages/Resource1";
-import ResourceDetail from "../pages/ResourceDetail";
-import AgroExpert from "../pages/AgroExpert"
-import CropSell from "../pages/CropSell"
-import CropDetail from "../pages/CropDetailCard"
-import Reports from "../pages/FarmingReport"
-import QuickSupport from "../pages/QuickSupport"
-import FarmingRoutine from "../pages/FarmingRoutine"
-import LiveCropPricing from "../pages/LiveCropPricing";
-import CropDetection from "../pages/CropDetection";
-import ForgotPasswordPage from "../pages/ForgotPassword";
-// Function to check if user is authenticated
-const isAuthenticated = () => {
-  return localStorage.getItem("authToken") !== null; // Check if auth token exists
-};
+/**
+ * App shell: providers, router, route-level code splitting, scroll restoration, document titles,
+ * error boundary and the lazy chatbot. Routes live in src/routes.jsx (do not add routes here).
+ */
+import { Suspense, lazy, useEffect, useState } from 'react'
+import { BrowserRouter, Route, Routes, matchPath, useLocation } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { ErrorBoundary, PageLoader, ToastProvider } from './components/ui'
+import { GuestRoute, ProtectedRoute } from './components/ProtectedRoute'
+import PublicLayout from './layouts/PublicLayout'
+import AppLayout from './layouts/AppLayout'
+import { NotFoundPage, ROUTES } from './routes'
+import { SITE } from './hooks/useDocumentTitle'
 
-// ProtectedRoute Component
-const ProtectedRoute = ({ element }) => {
-  return isAuthenticated() ? element : <Navigate to="/login" replace />;
-};
+const Chatbot = lazy(() => import('./components/chatbot/Chatbot'))
+const NO_CHAT = ['/login', '/signup', '/forgot-password']
 
-const App = () => {
+/** Scroll to top on navigation, set the document title, and announce the page to screen readers. */
+function RouteEffects() {
+  const { pathname, hash } = useLocation()
+  const [announce, setAnnounce] = useState('')
+
+  useEffect(() => {
+    if (hash) return
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [pathname, hash])
+
+  useEffect(() => {
+    const match = ROUTES.find((r) => matchPath({ path: r.path, end: true }, pathname))
+    const title = match ? match.title : 'Page not found'
+    document.title = match?.path === '/' ? `${SITE} | ${title}` : `${title} | ${SITE}`
+    setAnnounce(title)
+  }, [pathname])
+
+  return <div className="ag-sr-only" role="status" aria-live="polite">{announce}</div>
+}
+
+/** Mount the chatbot only after the page is idle so it never competes with first paint. */
+function LazyChatbot() {
+  const { pathname } = useLocation()
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    const go = () => setReady(true)
+    if ('requestIdleCallback' in window) { const id = window.requestIdleCallback(go, { timeout: 3000 }); return () => window.cancelIdleCallback(id) }
+    const t = setTimeout(go, 1500)
+    return () => clearTimeout(t)
+  }, [])
+  if (!ready || NO_CHAT.includes(pathname.toLowerCase().replace(/\/$/, ''))) return null
+  return <Suspense fallback={null}><Chatbot /></Suspense>
+}
+
+/** Error boundary that resets when the route changes. */
+function RoutedBoundary({ children }) {
+  const { pathname } = useLocation()
+  return <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>
+}
+
+const renderRoutes = (list) => list.map((r) => {
+  const Page = r.component
+  return <Route key={r.path} path={r.path} element={<Page />} />
+})
+
+function AppRoutes() {
+  const by = (layout) => ROUTES.filter((r) => r.layout === layout)
   return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-};
+    <Routes>
+      <Route element={<PublicLayout />}>
+        {renderRoutes(by('public'))}
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
 
-const AppContent = () => {
-  const location = useLocation();
-  const hideChatbotRoutes = ["/Login", "/Signup"]; // Hide chatbot on auth pages
+      <Route element={<GuestRoute />}>{renderRoutes(by('auth'))}</Route>
 
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          {by('app').map((r) => {
+            const Page = r.component
+            return (
+              <Route key={r.path} element={r.roles ? <ProtectedRoute roles={r.roles} /> : undefined}>
+                <Route path={r.path} element={<Page />} />
+              </Route>
+            )
+          })}
+        </Route>
+      </Route>
+    </Routes>
+  )
+}
+
+export default function App() {
   return (
-    <>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/About" element={<About />} />
-        <Route path="/ContactUs" element={<Contact />} />
-        <Route path="/Feature" element={<Feature />} />
-        <Route path="/Login" element={<LoginPage />} />
-        <Route path="/Signup" element={<SignupPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-
-        {/* Protected Routes */}
-        <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-        <Route path="/Setting" element={<ProtectedRoute element={<Setting />} />} />
-        <Route path="/features/government-schemes" element={<ProtectedRoute element={<GovSchemes />} />} />
-        <Route path="/features/MarketAccess" element={<ProtectedRoute element={<MarketAccess />} />} />
-        <Route path="/features/MarketAccess/product/:id" element={<ProtectedRoute element={<CropDetail />} />} />
-        <Route path="/features/expert" element={<ProtectedRoute element={<AgroExpert />} />} />
-        <Route path="/features/crop-detection" element={<ProtectedRoute element={<CropDetection />} />} />
-        <Route path="/features/resources" element={<ProtectedRoute element={<ResourcesPage />} />} />
-        <Route path="/features/resources/:_id" element={<ProtectedRoute element={<ResourceDetail />} />} />
-        <Route path="/state-schemes/:stateName" element={<ProtectedRoute element={<StateSchemes />} />} />
-        <Route path="/QuickSupport" element={<ProtectedRoute element={<QuickSupport />} />} />
-        <Route path="/Reports" element={<ProtectedRoute element={<Reports />} />} />
-        <Route path="/LiveCropPricing" element={<ProtectedRoute element={<LiveCropPricing />} />} />
-        <Route path="/Routine" element={<ProtectedRoute element={<FarmingRoutine />} />} />
-        <Route path="/CropSell" element={<ProtectedRoute element={<CropSell />} />} />
-        <Route path="/product" element={<ProtectedRoute element={<Products />} />} />
-        <Route path="/OrderHistory" element={<ProtectedRoute element={<OrderHistory />} />} />
-      </Routes>
-
-      {!hideChatbotRoutes.includes(location.pathname) && <Chatbot />}
-    </>
-  );
-};
-
-export default App;
+    <BrowserRouter>
+      <AuthProvider>
+        <ToastProvider>
+          <RouteEffects />
+          <RoutedBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <AppRoutes />
+            </Suspense>
+          </RoutedBoundary>
+          <LazyChatbot />
+        </ToastProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}

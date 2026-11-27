@@ -28,11 +28,14 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
+      'react/prop-types': 'off', // no TypeScript/PropTypes in this project; components document props in their header comment
+      'react/no-unknown-property': ['error', { ignore: ['fetchpriority'] }],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
     },
   },
+  { files: ['vite.config.js'], languageOptions: { globals: globals.node } },
+  { files: ['src/routes.jsx'], rules: { 'react-refresh/only-export-components': 'off' } },
 ]

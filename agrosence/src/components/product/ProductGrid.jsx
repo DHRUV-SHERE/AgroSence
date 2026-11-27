@@ -1,15 +1,16 @@
-import ProductCard from "./ProductCard";
+import ProductCard from './ProductCard'
+import '../../styles/pages-market.css'
 
-const ProductGrid = ({ products }) => {
+export default function ProductGrid({ crops, userId }) {
   return (
-    <div className="row g-4">
-      {products.map((product, index) => (
-        <div key={index} className="col-12 col-sm-6 col-lg-3">
-          <ProductCard product={product} />
-        </div>
+    <ul className="ag-grid" style={{ '--min': '15rem', listStyle: 'none' }}>
+      {crops.map((c) => (
+        <li key={c.id} style={{ display: 'flex' }}>
+          <div style={{ flex: 1, display: 'flex' }}>
+            <div style={{ flex: 1 }}><ProductCard crop={c} mine={Boolean(userId) && c.sellerId === userId} /></div>
+          </div>
+        </li>
       ))}
-    </div>
-  );
-};
-
-export default ProductGrid;
+    </ul>
+  )
+}

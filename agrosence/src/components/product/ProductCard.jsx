@@ -1,41 +1,42 @@
-import { BsCartPlus } from "react-icons/bs"
-import { FaLocationDot } from "react-icons/fa6";
+/** Marketplace crop card. The whole card is one link (stretched anchor on the title). */
+import { Link } from 'react-router-dom'
+import { LuLeaf, LuMapPin, LuPackage } from 'react-icons/lu'
+import { Badge } from '../ui'
+import { formatINR, formatNumber } from '../../lib/format'
+import { imageUrl, srcSet } from '../../lib/imageUrl'
+import { categoryLabel } from '../marketaccess/cropMeta'
+import '../../styles/pages-market.css'
 
-const ProductCard = ({ product }) => {
-  const { name, price, location, image } = product
-
+export default function ProductCard({ crop, mine }) {
+  const img = crop.images[0]
   return (
-    <div className="card h-100 border-0" style={{borderRadius:"8px 8px 100px 8px"}}>
-      <div className="position-relative">
-        <img
-          src={image || "/placeholder.svg"}
-          className="card-img-top"
-          alt={name}
-          style={{ height: "200px", objectFit: "cover" }}
-        />
+    <article className="ag-crop">
+      <img
+        className="ag-crop__img"
+        src={imageUrl(img, { width: 480 })}
+        srcSet={srcSet(img, [320, 480, 720])}
+        sizes="(max-width: 40rem) 100vw, 20rem"
+        width="480"
+        height="360"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="ag-crop__tags">
+        {crop.organic && <Badge tone="success"><LuLeaf aria-hidden="true" />Organic</Badge>}
+        {mine && <Badge tone="brand">Your listing</Badge>}
       </div>
-      <div className="card-body d-flex flex-column">
-        <h5 className="card-title mb-2 fw-bold fs-4">{name}</h5>
-        <p className="card-text text-success fw-bold mb-2">₹ {price}/kg</p>
-        <div className="d-flex justify-content-between align-items-center mt-auto">
-          <div className="text-muted">
-            <small>
-              <i className="bi bi-geo-alt me-1"></i>
-              <FaLocationDot size={18} /> {location}
-            </small>
-          </div>
+      <div className="ag-crop__body">
+        <h3 className="ag-crop__name">
+          <Link to={`/features/MarketAccess/product/${crop.id}`}>{crop.name}</Link>
+        </h3>
+        <div className="ag-crop__price">{formatINR(crop.price)} <small>per {crop.unit}</small></div>
+        <div className="ag-crop__meta">
+          <span><LuPackage aria-hidden="true" />{formatNumber(crop.quantity)} {crop.unit} left</span>
+          {crop.state && <span><LuMapPin aria-hidden="true" />{crop.state}</span>}
         </div>
+        <small className="ag-muted">{categoryLabel(crop.category)}</small>
       </div>
-      <div className="d-flex justify-content-end align-item-center" style={{height:"70px"}}>
-        <div className="" style={{backgroundColor:"#eaeaea",padding:"10px 2px 2px 10px",borderRadius:"30px 0px 0px 0px "}}>
-          <button style={{width:"45px",borderRadius:"50%", backgroundColor:"#34a853"}} className="btn p-2 text-white">
-            <BsCartPlus size={20} />
-          </button>
-        </div>
-      </div>
-    </div>
+    </article>
   )
 }
-
-export default ProductCard
-
