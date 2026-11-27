@@ -40,7 +40,7 @@ state in effects, or start from the same value on server and client (see `useThe
 - `public/robots.txt`, `public/llms.txt`, `public/manifest.webmanifest`, `public/icons/*`, `public/og-image.jpg`,
   `public/favicon.ico`. `scripts/generate-brand-assets.mjs` regenerates the icons and the OG image
   (needs `npm i --no-save sharp`; it is not a project dependency).
-- `vercel.json`: SPA fallback to `spa.html`, `cleanUrls`, `trailingSlash: false`, `X-Robots-Tag: noindex` for app and
+- `vercel.json`: SPA fallback rewrite to `/spa` (served from `spa.html`; with `cleanUrls` the destination must be `/spa`, NOT `/spa.html`), `cleanUrls`, `trailingSlash: false`, `X-Robots-Tag: noindex` for app and
   auth paths, cache headers for the SEO files. The CSP is unchanged: JSON-LD is `type="application/ld+json"`, which is
   data and is not governed by `script-src`; the only inline script is the theme bootstrap, covered by its sha256.
   If you edit that script, recompute the hash in the CSP.
