@@ -68,6 +68,7 @@ const env = {
     apiSecret: process.env.CLOUDINARY_API_SECRET,
     url: process.env.CLOUDINARY_URL,
   },
+  groq: { apiKey: process.env.GROQ_API_KEY, model: process.env.GROQ_MODEL || "openai/gpt-oss-20b" },
   gemini: { apiKey: process.env.GEMINI_API_KEY, model: process.env.GEMINI_MODEL || "gemini-4-hydrogen" },
   plantId: { apiKey: process.env.PLANT_ID_API_KEY },
   mail: {

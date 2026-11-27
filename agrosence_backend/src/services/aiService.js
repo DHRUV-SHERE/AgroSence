@@ -55,21 +55,66 @@ async function callGemini(model, message) {
   }
 }
 
-async function getChatAnswer(message) {
-  if (!env.gemini.apiKey) throw ApiError.unavailable("The assistant is not configured on the server");
+// ---- Groq (OpenAI-compatible chat completions; free tier) ----
+const groqModels = () => [...new Set([env.groq.model, "openai/gpt-oss-20b", "openai/gpt-oss-120b"].filter(Boolean))];
+
+async function callGroq(model, message) {
+  const { data } = await axios.post(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: message },
+      ],
+      max_completion_tokens: 700,
+      temperature: 0.4,
+      // gpt-oss models are reasoning models: keep thinking short so the visible answer is not starved of tokens.
+      ...(model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" } : {}),
+    },
+    { headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.groq.apiKey}` }, timeout: 20000 }
+  );
+  return data.choices?.[0]?.message?.content?.trim() || NO_ANSWER;
+}
+
+async function viaGroq(message) {
+  for (const model of groqModels()) {
+    try {
+      return await callGroq(model, message);
+    } catch (err) {
+      const status = err.response?.status;
+      console.error(`[groq] ${model} failed:`, status || err.message, err.response?.data?.error?.message || "");
+      if (status !== 404 && status !== 400) throw err; // model gone/invalid -> try next; auth/quota/server -> stop
+    }
+  }
+  throw new Error("no Groq model available");
+}
+
+async function viaGemini(message) {
   for (const model of modelChain()) {
     try {
       return await callGemini(model, message);
     } catch (err) {
       const status = err.response?.status;
       console.error(`[gemini] ${model} failed:`, status || err.message, err.response?.data?.error?.message || "");
-      // Only move on to the next model when this one is unavailable to the key; auth/quota problems won't be fixed by another model.
-      const msg = String(err.response?.data?.error?.message || "");
-      if (status === 403 && /free tier|billing/i.test(msg)) {
-        console.error("[gemini] The Google project behind GEMINI_API_KEY has no free tier. Enable billing at https://aistudio.google.com/billing or use a key from a new project.");
-        break;
-      }
+      if (status === 403 && /free tier|billing/i.test(String(err.response?.data?.error?.message || ""))) break; // no model will work
       if (status !== 404 && status !== 403 && status !== 400) break;
+    }
+  }
+  throw new Error("no Gemini model available");
+}
+
+/** Provider order: Groq (if GROQ_API_KEY), then Gemini (if GEMINI_API_KEY). */
+async function getChatAnswer(message) {
+  const providers = [];
+  if (env.groq.apiKey) providers.push(viaGroq);
+  if (env.gemini.apiKey) providers.push(viaGemini);
+  if (!providers.length) throw ApiError.unavailable("The assistant is not configured on the server");
+  for (const run of providers) {
+    try {
+      return await run(message);
+    } catch {
+      /* logged above; try the next provider */
     }
   }
   throw ApiError.unavailable("The assistant is temporarily unavailable");

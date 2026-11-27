@@ -368,3 +368,45 @@ test("chatbot: parses Interactions API output and falls back to generateContent 
     env.gemini.apiKey = prevKey;
   }
 });
+
+test("chatbot: Groq is used first, falls back to Gemini, and reports unavailable when all fail", async () => {
+  const axios = require("axios");
+  const env = require("../src/config/env");
+  const ai = require("../src/services/aiService");
+  const orig = axios.post;
+  const prev = { g: env.groq.apiKey, m: env.gemini.apiKey };
+  const urls = [];
+  try {
+    env.groq.apiKey = "gk";
+    env.gemini.apiKey = null;
+    axios.post = async (url, body) => {
+      urls.push(url);
+      assert.ok(body.messages && body.model);
+      return { data: { choices: [{ message: { content: " Sow in November. " } }] } };
+    };
+    assert.equal(await ai.getChatAnswer("when to sow wheat"), "Sow in November.");
+    assert.match(urls[0], /api\.groq\.com\/openai\/v1\/chat\/completions/);
+
+    env.gemini.apiKey = "mk";
+    axios.post = async (url) => {
+      if (url.includes("groq")) {
+        const e = new Error("rate");
+        e.response = { status: 429, data: { error: { message: "rate limited" } } };
+        throw e;
+      }
+      return { data: { steps: [{ type: "model_output", content: [{ type: "text", text: "from gemini" }] }] } };
+    };
+    assert.equal(await ai.getChatAnswer("hi"), "from gemini");
+
+    axios.post = async () => {
+      const e = new Error("down");
+      e.response = { status: 500, data: {} };
+      throw e;
+    };
+    await assert.rejects(() => ai.getChatAnswer("hi"), /temporarily unavailable/);
+  } finally {
+    axios.post = orig;
+    env.groq.apiKey = prev.g;
+    env.gemini.apiKey = prev.m;
+  }
+});
