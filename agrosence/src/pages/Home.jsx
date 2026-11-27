@@ -100,7 +100,7 @@ export default function Home() {
             <h2 id="how-h">How does AgroSense work for farmers?</h2>
             <p>Four steps from sign-up to a sale.</p>
           </div>
-          <ol className="ag-steps">
+          <ol className="ag-howsteps">
             {STEPS.map((st) => <li key={st.name}><div><h3>{st.name}</h3><p>{st.text}</p></div></li>)}
           </ol>
         </div>

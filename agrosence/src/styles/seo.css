@@ -8,11 +8,11 @@
 @media (max-width: 36rem) { .ag-facts > div { grid-template-columns: 1fr; gap: var(--s-1); } }
 
 /* How it works: ordered steps with a clay numeral */
-.ag-steps { list-style: none; counter-reset: ag-step; margin: 0; padding: 0; display: grid; gap: var(--s-5); max-width: 52rem; }
-.ag-steps li { counter-increment: ag-step; display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--s-4); align-items: start; }
-.ag-steps li::before { content: counter(ag-step); font-family: var(--font-display); font-size: var(--fs-2xl); line-height: 1; color: var(--clay); font-variant-numeric: tabular-nums; }
-.ag-steps h3 { margin: 0 0 var(--s-1); font-size: var(--fs-lg); }
-.ag-steps p { margin: 0; color: var(--ink-2); }
+.ag-howsteps { list-style: none; counter-reset: ag-step; margin: 0; padding: 0; display: grid; gap: var(--s-5); max-width: 52rem; }
+.ag-howsteps li { counter-increment: ag-step; display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--s-4); align-items: start; }
+.ag-howsteps li::before { content: counter(ag-step); font-family: var(--font-display); font-size: var(--fs-2xl); line-height: 1; color: var(--clay); font-variant-numeric: tabular-nums; }
+.ag-howsteps h3 { margin: 0 0 var(--s-1); font-size: var(--fs-lg); }
+.ag-howsteps p { margin: 0; color: var(--ink-2); }
 
 /* FAQ accordion (native <details>, works without JavaScript) */
 .ag-qa { border-top: 1px solid var(--line-strong); max-width: 52rem; }
