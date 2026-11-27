@@ -64,6 +64,11 @@ async function getChatAnswer(message) {
       const status = err.response?.status;
       console.error(`[gemini] ${model} failed:`, status || err.message, err.response?.data?.error?.message || "");
       // Only move on to the next model when this one is unavailable to the key; auth/quota problems won't be fixed by another model.
+      const msg = String(err.response?.data?.error?.message || "");
+      if (status === 403 && /free tier|billing/i.test(msg)) {
+        console.error("[gemini] The Google project behind GEMINI_API_KEY has no free tier. Enable billing at https://aistudio.google.com/billing or use a key from a new project.");
+        break;
+      }
       if (status !== 404 && status !== 403 && status !== 400) break;
     }
   }
