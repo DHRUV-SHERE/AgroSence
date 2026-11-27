@@ -15,9 +15,8 @@ import {
   TextInput,
   Toolbar,
   DeleteWithConfirmButton,
-  FunctionField,
 } from "react-admin";
-import { BulkActions, EmptyState, ListActions, NoResults, RowDelete, minLength, required, stateChoices, url } from "./shared";
+import { TruncatedTextField, BulkActions, EmptyState, ListActions, NoResults, RowDelete, minLength, required, stateChoices, url } from "./shared";
 import { useCan } from "../permissions";
 import { SafeUrlField } from "./SafeUrlField";
 
@@ -40,13 +39,12 @@ export const SchemeList = () => {
         rowClick="edit"
         bulkActionButtons={isStaff ? <BulkActions allow /> : false}
         empty={<NoResults noun="schemes" />}
-        sx={{ "& .column-description,& .column-eligibility,& .column-benefits": { maxWidth: 280 } }}
       >
         <TextField source="name" />
         <TextField source="state" sortable />
-        <FunctionField label="Description" source="description" sortable={false} render={(r: { description?: string }) => ((r.description ?? "").length > 90 ? `${r.description?.slice(0, 90)}...` : r.description)} />
-        <TextField source="eligibility" />
-        <TextField source="benefits" />
+        <TruncatedTextField source="description" label="Description" />
+        <TruncatedTextField source="eligibility" label="Eligibility" />
+        <TruncatedTextField source="benefits" label="Benefits" />
         <SafeUrlField source="applyLink" label="Apply link" />
         <DateField source="createdAt" label="Created" />
         <EditButton />

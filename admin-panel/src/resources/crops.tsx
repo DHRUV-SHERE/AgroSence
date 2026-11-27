@@ -64,7 +64,7 @@ export const CropList = () => (
         label=""
         sortable={false}
         render={(r: Crop) => (
-          <Avatar variant="rounded" src={r.cropImages?.[0]} alt={r.cropName} sx={{ width: 44, height: 44 }}>
+          <Avatar variant="rounded" src={r.cropImages?.[0]} alt={r.cropName} sx={{ width: 36, height: 36 }}>
             {r.cropName?.charAt(0)}
           </Avatar>
         )}

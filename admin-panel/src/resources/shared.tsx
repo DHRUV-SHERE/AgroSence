@@ -6,6 +6,7 @@ import {
   ExportButton,
   TopToolbar,
   useListContext,
+  useRecordContext,
   useResourceContext,
 } from "react-admin";
 import { Box, Button, Typography } from "@mui/material";
@@ -92,3 +93,15 @@ export const RowDelete = ({ noun }: { noun: string }) => {
 };
 
 export { useCan };
+
+/** Single-line text cell with ellipsis; full text is available as a native tooltip and on the Show/Edit page. */
+export const TruncatedTextField = ({ source, maxWidth = 280 }: { source: string; label?: string; sortable?: boolean; maxWidth?: number }) => {
+  const record = useRecordContext();
+  const value = record ? (record as Record<string, unknown>)[source] : undefined;
+  const text = value == null ? "" : String(value);
+  return (
+    <Box component="span" title={text} sx={{ display: "block", maxWidth, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      {text}
+    </Box>
+  );
+};

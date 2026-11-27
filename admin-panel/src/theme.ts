@@ -65,6 +65,9 @@ export const tokens = {
 const fontStack =
   '"Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
+export const APPBAR_H = 56;
+export const ROW_H = 52;
+
 export const R = { sm: 6, md: 10, lg: 14 } as const;
 
 type Tok = { [K in keyof (typeof tokens)["light"]]: string };
@@ -103,6 +106,7 @@ const build = (mode: "light" | "dark"): RaThemeOptions => {
       button: { textTransform: "none", fontWeight: 600, letterSpacing: 0 },
     },
     shape: { borderRadius: R.md },
+    sidebar: { width: 256, closedWidth: 72 },
     components: {
       ...defaultTheme.components,
       MuiCssBaseline: {
@@ -244,17 +248,75 @@ const build = (mode: "light" | "dark"): RaThemeOptions => {
       MuiDivider: { styleOverrides: { root: { borderColor: t.line } } },
       MuiTablePagination: { styleOverrides: { root: { color: t.ink2 } } },
       // react-admin components
+      // ---- App shell: AppBar + sidebar fixed, only the content region (and list tables) scroll ----
       RaLayout: {
         styleOverrides: {
           root: {
-            "& .RaLayout-content": { padding: 0, backgroundColor: t.paper, minWidth: 0 },
+            height: "100dvh",
+            minHeight: 0,
+            minWidth: 0,
+            overflow: "hidden",
+            "& .RaLayout-appFrame": {
+              flexGrow: 0,
+              marginTop: APPBAR_H,
+              height: `calc(100dvh - ${APPBAR_H}px)`,
+              minHeight: 0,
+              minWidth: 0,
+            },
+            "& .RaLayout-contentWithSidebar": { minHeight: 0, minWidth: 0, overflow: "hidden", flex: "1 1 0" },
+            "& .RaLayout-content": {
+              padding: 0,
+              backgroundColor: t.paper,
+              minWidth: 0,
+              minHeight: 0,
+              overflowX: "hidden",
+              overflowY: "auto",
+              paddingInline: 12,
+              paddingBottom: 12,
+            },
           },
+        },
+      },
+      RaAppBar: {
+        styleOverrides: {
+          root: { height: APPBAR_H, "& .RaAppBar-toolbar": { minHeight: APPBAR_H, height: APPBAR_H } },
         },
       },
       RaSidebar: {
         styleOverrides: {
           root: {
-            "& .MuiDrawer-paper": { backgroundColor: t.surface2, borderRight: `1px solid ${t.line}`, color: t.ink2 },
+            height: "100%",
+            flexShrink: 0,
+            "& .MuiDrawer-paper": { backgroundColor: t.surface2, borderRight: `1px solid ${t.line}`, color: t.ink2, height: "100%" },
+            "& .RaSidebar-fixed": {
+              position: "relative",
+              height: "100%",
+              width: "100%",
+              overflowX: "hidden",
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": { display: "block", width: 6 },
+            },
+            "& .MuiDrawer-docked, & .MuiDrawer-paperAnchorDockedLeft": { height: "100%" },
+          },
+        },
+      },
+      RaList: {
+        styleOverrides: {
+          root: {
+            flex: "1 1 auto",
+            minHeight: 0,
+            minWidth: 0,
+            "& .RaList-main": { minHeight: 0, minWidth: 0 },
+            "& .RaList-actions": { flexShrink: 0 },
+            "& .RaList-content": {
+              flex: "1 1 auto",
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "visible",
+            },
+            "& .MuiTablePagination-root": { flexShrink: 0 },
           },
         },
       },
@@ -283,8 +345,40 @@ const build = (mode: "light" | "dark"): RaThemeOptions => {
       RaDatagrid: {
         styleOverrides: {
           root: {
-            "& .RaDatagrid-headerCell": { backgroundColor: t.surface2, color: t.ink2 },
+            flex: "1 1 auto",
+            minHeight: 0,
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            "& .RaDatagrid-tableWrapper": {
+              flex: "1 1 auto",
+              minHeight: 0,
+              overflow: "auto",
+              overscrollBehavior: "contain",
+              borderRadius: `${R.lg}px`,
+            },
+            "& .RaDatagrid-table": { width: "100%" },
+            "& .RaDatagrid-headerCell": {
+              backgroundColor: t.surface2,
+              color: t.ink2,
+              position: "sticky",
+              top: 0,
+              zIndex: 2,
+              boxShadow: `inset 0 -1px 0 ${t.lineStrong}`,
+            },
             "& .RaDatagrid-clickableRow": { cursor: "pointer" },
+            // compact fixed-height rows; text never wraps, long text is cut with an ellipsis
+            "& .RaDatagrid-rowCell": {
+              height: ROW_H,
+              maxWidth: 320,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              paddingBlock: 6,
+            },
+            "& .RaDatagrid-headerCell, & .RaDatagrid-rowCell.RaDatagrid-checkbox, & .RaDatagrid-checkbox": { whiteSpace: "nowrap" },
+            "& .RaDatagrid-rowCell.RaDatagrid-checkbox, & .RaDatagrid-headerCell.RaDatagrid-checkbox": { width: 48, maxWidth: 48, padding: "0 0 0 4px" },
+            "& .RaDatagrid-rowCell .MuiButton-root": { whiteSpace: "nowrap" },
           },
         },
       },

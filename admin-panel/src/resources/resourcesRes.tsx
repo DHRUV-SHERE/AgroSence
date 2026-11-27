@@ -18,7 +18,7 @@ import {
   type Validator,
 } from "react-admin";
 import { Avatar } from "@mui/material";
-import { BulkActions, EmptyState, ListActions, NoResults, RowDelete, minLength, required, url } from "./shared";
+import { TruncatedTextField, BulkActions, EmptyState, ListActions, NoResults, RowDelete, minLength, required, url } from "./shared";
 import { useCan } from "../permissions";
 import { SafeUrlField } from "./SafeUrlField";
 
@@ -49,13 +49,13 @@ export const ResourceList = () => {
           label=""
           sortable={false}
           render={(r: { image?: string; name?: string }) => (
-            <Avatar variant="rounded" src={r.image} alt={r.name} sx={{ width: 44, height: 44 }}>
+            <Avatar variant="rounded" src={r.image} alt={r.name} sx={{ width: 36, height: 36 }}>
               {r.name?.charAt(0)}
             </Avatar>
           )}
         />
         <TextField source="name" />
-        <FunctionField label="Description" source="description" sortable={false} render={(r: { description?: string }) => ((r.description ?? "").length > 90 ? `${r.description?.slice(0, 90)}...` : r.description)} />
+        <TruncatedTextField source="description" label="Description" />
         <TextField source="popularbrand" label="Popular brand" />
         <TextField source="purpose" />
         <SafeUrlField source="link" />
