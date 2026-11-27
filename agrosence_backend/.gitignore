@@ -1,2 +1,12 @@
+# secrets
 .env
+.env.*
+!.env.example
+
+# deps / runtime
 node_modules/
+uploads/
+logs/
+*.log
+coverage/
+.cache/
