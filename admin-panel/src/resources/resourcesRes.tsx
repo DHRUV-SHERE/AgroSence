@@ -55,6 +55,7 @@ export const ResourceList = () => {
           )}
         />
         <TextField source="name" />
+        <FunctionField label="Description" source="description" sortable={false} render={(r: { description?: string }) => ((r.description ?? "").length > 90 ? `${r.description?.slice(0, 90)}...` : r.description)} />
         <TextField source="popularbrand" label="Popular brand" />
         <TextField source="purpose" />
         <SafeUrlField source="link" />
@@ -96,7 +97,7 @@ const EditToolbar = () => (
 
 export const ResourceCreate = () => (
   <Create redirect="list">
-    <SimpleForm sx={{ maxWidth: 720 }}>
+    <SimpleForm sx={{ maxWidth: 960 }}>
       <Fields imageRequired />
     </SimpleForm>
   </Create>
@@ -105,7 +106,7 @@ export const ResourceCreate = () => (
 /** The image input previews the current image; picking a new file replaces it. */
 export const ResourceEdit = () => (
   <Edit mutationMode="pessimistic" redirect="list">
-    <SimpleForm sx={{ maxWidth: 720 }} toolbar={<EditToolbar />}>
+    <SimpleForm sx={{ maxWidth: 960 }} toolbar={<EditToolbar />}>
       <Fields imageRequired={false} />
     </SimpleForm>
   </Edit>

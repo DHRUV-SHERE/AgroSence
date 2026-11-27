@@ -1,63 +1,304 @@
 import { defaultTheme } from "react-admin";
 import type { RaThemeOptions } from "react-admin";
 
-const fontBody = '"Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-const fontDisplay = '"Fraunces", Georgia, "Times New Roman", serif';
-
-const shared: Pick<RaThemeOptions, "typography" | "shape" | "components"> = {
-  typography: {
-    fontFamily: fontBody,
-    h4: { fontFamily: fontDisplay, fontWeight: 600, letterSpacing: "-0.01em" },
-    h5: { fontFamily: fontDisplay, fontWeight: 600, letterSpacing: "-0.01em" },
-    h6: { fontFamily: fontDisplay, fontWeight: 600 },
-    button: { textTransform: "none", fontWeight: 600 },
+/**
+ * Design tokens mirror agrosence/src/styles/tokens.css (the website is the source of truth).
+ * Keep values in sync with it; do not invent new colours here.
+ */
+export const tokens = {
+  light: {
+    paper: "#f5f8f6",
+    paper2: "#ebf0ed",
+    surface: "#ffffff",
+    surface2: "#f9fbfa",
+    ink: "#0f1f17",
+    ink2: "#43544a",
+    ink3: "#5c6d63",
+    line: "#d9e2dc",
+    lineStrong: "#b9c6bd",
+    primary: "#1b6b3a",
+    primaryHover: "#14552d",
+    primarySoft: "#dcefe3",
+    onPrimary: "#ffffff",
+    amber: "#d99a0b",
+    amberSoft: "#fcefc9",
+    leaf: "#2d7a3e",
+    leafSoft: "#dff1e3",
+    info: "#2456a4",
+    infoSoft: "#e0eaf7",
+    danger: "#b42318",
+    dangerSoft: "#fadedb",
+    focus: "#2456a4",
+    shadow1: "0 1px 2px rgb(15 31 23 / 0.07), 0 1px 1px rgb(15 31 23 / 0.04)",
+    shadow2: "0 4px 12px -2px rgb(15 31 23 / 0.10), 0 2px 4px rgb(15 31 23 / 0.05)",
+    shadow3: "0 18px 40px -12px rgb(15 31 23 / 0.22), 0 6px 12px -4px rgb(15 31 23 / 0.08)",
   },
-  shape: { borderRadius: 12 },
-  components: {
-    ...defaultTheme.components,
-    MuiButton: { defaultProps: { disableElevation: true } },
-    MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
-    MuiCard: { styleOverrides: { root: { borderRadius: 16 } } },
-    MuiTableCell: {
-      styleOverrides: { head: { fontWeight: 700, fontSize: "0.78rem", letterSpacing: "0.02em" } },
+  dark: {
+    paper: "#0c1511",
+    paper2: "#14211b",
+    surface: "#111c16",
+    surface2: "#172620",
+    ink: "#e8f1ec",
+    ink2: "#b4c4ba",
+    ink3: "#8fa197",
+    line: "#243229",
+    lineStrong: "#355044",
+    primary: "#4cc27a",
+    primaryHover: "#66d08e",
+    primarySoft: "#14301f",
+    onPrimary: "#06180e",
+    amber: "#f0b93a",
+    amberSoft: "#33290c",
+    leaf: "#7fd39a",
+    leafSoft: "#14301f",
+    info: "#8db4ee",
+    infoSoft: "#162842",
+    danger: "#ff8f84",
+    dangerSoft: "#3d1a17",
+    focus: "#8db4ee",
+    shadow1: "0 1px 2px rgb(0 0 0 / 0.4)",
+    shadow2: "0 4px 12px -2px rgb(0 0 0 / 0.5)",
+    shadow3: "0 18px 40px -12px rgb(0 0 0 / 0.65)",
+  },
+} as const;
+
+const fontStack =
+  '"Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
+export const R = { sm: 6, md: 10, lg: 14 } as const;
+
+type Tok = { [K in keyof (typeof tokens)["light"]]: string };
+
+const build = (mode: "light" | "dark"): RaThemeOptions => {
+  const t: Tok = tokens[mode];
+  const dark = mode === "dark";
+  const heading = { fontFamily: fontStack, fontWeight: 700, letterSpacing: "-0.015em", color: t.ink };
+  const ring = { outline: `2px solid ${t.focus}`, outlineOffset: 2 };
+
+  return {
+    ...defaultTheme,
+    palette: {
+      mode,
+      primary: { main: t.primary, dark: t.primaryHover, light: dark ? t.primaryHover : "#3f8d5b", contrastText: t.onPrimary },
+      secondary: { main: t.amber, contrastText: "#0f1f17" },
+      background: { default: t.paper, paper: t.surface },
+      text: { primary: t.ink, secondary: t.ink2, disabled: t.ink3 },
+      divider: t.line,
+      error: { main: t.danger, contrastText: dark ? "#2a0a07" : "#ffffff" },
+      warning: { main: t.amber, contrastText: "#0f1f17" },
+      info: { main: t.info, contrastText: dark ? "#07162d" : "#ffffff" },
+      success: { main: t.leaf, contrastText: dark ? "#06180e" : "#ffffff" },
+      action: { hover: t.paper2, selected: t.primarySoft, focus: t.primarySoft },
     },
-    MuiAppBar: { styleOverrides: { root: { boxShadow: "none" } } },
-  },
+    typography: {
+      fontFamily: fontStack,
+      h1: heading,
+      h2: heading,
+      h3: heading,
+      h4: { ...heading, fontSize: "1.75rem" },
+      h5: { ...heading, fontSize: "1.375rem" },
+      h6: { ...heading, fontSize: "1.0625rem" },
+      subtitle1: { fontWeight: 600 },
+      subtitle2: { fontWeight: 600 },
+      button: { textTransform: "none", fontWeight: 600, letterSpacing: 0 },
+    },
+    shape: { borderRadius: R.md },
+    components: {
+      ...defaultTheme.components,
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: { backgroundColor: t.paper, color: t.ink, fontFamily: fontStack, WebkitFontSmoothing: "antialiased" },
+          "::selection": { background: t.primarySoft },
+          ":focus-visible": ring,
+        },
+      },
+      MuiButton: {
+        defaultProps: { disableElevation: true },
+        styleOverrides: {
+          root: { borderRadius: R.md, fontWeight: 600, textTransform: "none", "&.Mui-focusVisible": ring },
+          sizeMedium: { minHeight: 40, paddingInline: 18 },
+          sizeSmall: { minHeight: 32, paddingInline: 12 },
+          sizeLarge: { minHeight: 46, paddingInline: 24 },
+          contained: { boxShadow: t.shadow1, "&:hover": { boxShadow: t.shadow2 } },
+          containedPrimary: { "&:hover": { backgroundColor: t.primaryHover } },
+          outlined: { borderColor: t.lineStrong, "&:hover": { backgroundColor: t.paper2, borderColor: t.lineStrong } },
+          text: { "&:hover": { backgroundColor: t.paper2 } },
+        },
+      },
+      MuiIconButton: { styleOverrides: { root: { borderRadius: R.md, "&.Mui-focusVisible": ring } } },
+      MuiLink: { styleOverrides: { root: { color: t.primary, fontWeight: 500, textUnderlineOffset: 3 } } },
+      MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
+      MuiCard: {
+        defaultProps: { elevation: 0 },
+        styleOverrides: {
+          root: { borderRadius: R.lg, border: `1px solid ${t.line}`, boxShadow: t.shadow1, backgroundColor: t.surface },
+        },
+      },
+      MuiCardHeader: { styleOverrides: { title: { fontWeight: 700 } } },
+      MuiAppBar: {
+        defaultProps: { color: "inherit", elevation: 0 },
+        styleOverrides: {
+          root: {
+            backgroundColor: t.surface,
+            color: t.ink,
+            boxShadow: "none",
+            borderBottom: `1px solid ${t.line}`,
+            backgroundImage: "none",
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: R.md,
+            backgroundColor: t.surface,
+            "& fieldset": { borderColor: t.lineStrong },
+            "&:hover fieldset": { borderColor: t.ink3 },
+            "&.Mui-focused fieldset": { borderColor: t.focus, borderWidth: 2 },
+            "&.Mui-error fieldset": { borderColor: t.danger },
+          },
+          input: { "&::placeholder": { color: t.ink3, opacity: 1 } },
+        },
+      },
+      MuiFilledInput: {
+        styleOverrides: { root: { borderRadius: R.md, backgroundColor: t.paper2, "&:before,&:after": { display: "none" } } },
+      },
+      MuiInputLabel: { styleOverrides: { root: { color: t.ink2, "&.Mui-focused": { color: t.focus } } } },
+      MuiFormHelperText: { styleOverrides: { root: { color: t.ink2 } } },
+      MuiTextField: { defaultProps: { variant: "outlined" } },
+      MuiCheckbox: { styleOverrides: { root: { color: t.ink3, "&.Mui-checked": { color: t.primary } } } },
+      MuiSwitch: {
+        styleOverrides: { switchBase: { "&.Mui-checked + .MuiSwitch-track": { backgroundColor: t.primary, opacity: 0.9 } } },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: { borderBottomColor: t.line, paddingBlock: 10 },
+          head: {
+            fontWeight: 700,
+            fontSize: "0.75rem",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            color: t.ink2,
+            backgroundColor: t.surface2,
+            borderBottom: `1px solid ${t.lineStrong}`,
+            whiteSpace: "nowrap",
+          },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            "&.RaDatagrid-row:nth-of-type(even)": { backgroundColor: t.surface2 },
+            "&.RaDatagrid-clickableRow:hover, &.MuiTableRow-hover:hover": { backgroundColor: t.primarySoft },
+            "&.Mui-selected": { backgroundColor: t.primarySoft },
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: { borderRadius: R.sm, fontWeight: 600, fontSize: "0.78rem" },
+          filledSuccess: { backgroundColor: t.leafSoft, color: dark ? t.leaf : "#1e5a2b" },
+          filledWarning: { backgroundColor: t.amberSoft, color: dark ? t.amber : "#6b4a00" },
+          filledError: { backgroundColor: t.dangerSoft, color: dark ? t.danger : "#8a1a10" },
+          filledInfo: { backgroundColor: t.infoSoft, color: dark ? t.info : "#1b4285" },
+          filledPrimary: { backgroundColor: t.primarySoft, color: dark ? t.primary : "#14552d" },
+          outlined: { borderColor: t.lineStrong },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: { borderRadius: R.md, alignItems: "center" },
+          standardSuccess: { backgroundColor: t.leafSoft, color: dark ? t.leaf : "#1e5a2b" },
+          standardWarning: { backgroundColor: t.amberSoft, color: dark ? t.amber : "#6b4a00" },
+          standardError: { backgroundColor: t.dangerSoft, color: dark ? t.danger : "#8a1a10" },
+          standardInfo: { backgroundColor: t.infoSoft, color: dark ? t.info : "#1b4285" },
+        },
+      },
+      MuiSnackbarContent: {
+        styleOverrides: {
+          root: {
+            borderRadius: R.md,
+            backgroundColor: dark ? t.surface2 : "#0f2419",
+            color: dark ? t.ink : "#f4faf6",
+            boxShadow: t.shadow3,
+          },
+        },
+      },
+      MuiDialog: { styleOverrides: { paper: { borderRadius: R.lg, boxShadow: t.shadow3, border: `1px solid ${t.line}` } } },
+      MuiDialogTitle: { styleOverrides: { root: { fontWeight: 700, fontSize: "1.125rem" } } },
+      MuiBackdrop: { styleOverrides: { root: { backgroundColor: dark ? "rgb(0 0 0 / 0.65)" : "rgb(15 31 23 / 0.55)" } } },
+      MuiMenu: { styleOverrides: { paper: { borderRadius: R.md, border: `1px solid ${t.line}`, boxShadow: t.shadow2 } } },
+      MuiMenuItem: { styleOverrides: { root: { borderRadius: R.sm, marginInline: 4, "&.Mui-selected": { backgroundColor: t.primarySoft } } } },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            backgroundColor: dark ? t.surface2 : "#0f2419",
+            color: dark ? t.ink : "#f4faf6",
+            borderRadius: R.sm,
+            fontSize: "0.78rem",
+          },
+        },
+      },
+      MuiTabs: { styleOverrides: { indicator: { backgroundColor: t.primary, height: 3, borderRadius: 3 } } },
+      MuiTab: { styleOverrides: { root: { textTransform: "none", fontWeight: 600 } } },
+      MuiDivider: { styleOverrides: { root: { borderColor: t.line } } },
+      MuiTablePagination: { styleOverrides: { root: { color: t.ink2 } } },
+      // react-admin components
+      RaLayout: {
+        styleOverrides: {
+          root: {
+            "& .RaLayout-content": { padding: 0, backgroundColor: t.paper, minWidth: 0 },
+          },
+        },
+      },
+      RaSidebar: {
+        styleOverrides: {
+          root: {
+            "& .MuiDrawer-paper": { backgroundColor: t.surface2, borderRight: `1px solid ${t.line}`, color: t.ink2 },
+          },
+        },
+      },
+      RaMenuItemLink: {
+        styleOverrides: {
+          root: {
+            borderRadius: R.md,
+            margin: "1px 12px",
+            paddingBlock: 8,
+            color: t.ink2,
+            fontWeight: 500,
+            borderLeft: "none",
+            "& .RaMenuItemLink-icon": { color: "inherit", minWidth: 36 },
+            "&:hover": { backgroundColor: t.paper2, color: t.ink },
+            "&.RaMenuItemLink-active": {
+              backgroundColor: dark ? t.primarySoft : t.ink,
+              color: dark ? t.primary : t.paper,
+              fontWeight: 600,
+              borderLeft: "none",
+              "& .RaMenuItemLink-icon": { color: "inherit" },
+              "&:hover": { backgroundColor: dark ? t.primarySoft : t.ink, color: dark ? t.primary : t.paper },
+            },
+          },
+        },
+      },
+      RaDatagrid: {
+        styleOverrides: {
+          root: {
+            "& .RaDatagrid-headerCell": { backgroundColor: t.surface2, color: t.ink2 },
+            "& .RaDatagrid-clickableRow": { cursor: "pointer" },
+          },
+        },
+      },
+      RaTopToolbar: { styleOverrides: { root: { gap: 4 } } },
+      RaToolbar: { styleOverrides: { root: { backgroundColor: "transparent" } } },
+    },
+  };
 };
 
-export const lightTheme: RaThemeOptions = {
-  ...defaultTheme,
-  ...shared,
-  palette: {
-    mode: "light",
-    primary: { main: "#2f6b3a", light: "#5b9a63", dark: "#1f4a28", contrastText: "#fff" },
-    secondary: { main: "#b7791f", light: "#e0a548", dark: "#8a5714", contrastText: "#fff" },
-    background: { default: "#f6f3ea", paper: "#fffdf8" },
-    text: { primary: "#1f2a1f", secondary: "#5a665a" },
-    divider: "#e4dfd0",
-    error: { main: "#b3392f" },
-    success: { main: "#3a7d44" },
-    warning: { main: "#c9892b" },
-    info: { main: "#2d6e86" },
-  },
-};
+export const lightTheme: RaThemeOptions = build("light");
+export const darkTheme: RaThemeOptions = build("dark");
 
-export const darkTheme: RaThemeOptions = {
-  ...defaultTheme,
-  ...shared,
-  palette: {
-    mode: "dark",
-    primary: { main: "#7fc088", light: "#a6d6ac", dark: "#4f8f59", contrastText: "#0f1a10" },
-    secondary: { main: "#e0a548", light: "#f0c27a", dark: "#b7791f", contrastText: "#1c1304" },
-    background: { default: "#121a14", paper: "#1a251c" },
-    text: { primary: "#e8efe6", secondary: "#a2b0a1" },
-    divider: "#2c3a2e",
-    error: { main: "#ef7b70" },
-    success: { main: "#7fc088" },
-    warning: { main: "#e0a548" },
-    info: { main: "#6fb6cf" },
-  },
+/** Categorical chart colours from the site's tokens (green, amber, blue, danger, violet, leaf). */
+export const chartPalette = (mode: "light" | "dark") => {
+  const t = tokens[mode];
+  return [t.primary, t.amber, t.info, t.danger, mode === "dark" ? "#b9a6f0" : "#6a4fb3", t.leaf];
 };
-
-/** Categorical chart colours that work on both themes. */
-export const chartColors = ["#3a7d44", "#c9892b", "#2d6e86", "#b3392f", "#7a6aa8", "#8a8f3a"];

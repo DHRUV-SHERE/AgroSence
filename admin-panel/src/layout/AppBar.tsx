@@ -8,7 +8,7 @@ const AccountMenu = () => {
   return (
     <UserMenu
       icon={
-        <Avatar src={data?.avatar} sx={{ width: 32, height: 32, bgcolor: "secondary.main", fontSize: 14 }}>
+        <Avatar src={data?.avatar} sx={{ width: 32, height: 32, bgcolor: "primary.main", color: "primary.contrastText", fontWeight: 700, fontSize: 14 }}>
           {(data?.fullName ?? "?").charAt(0).toUpperCase()}
         </Avatar>
       }
@@ -31,13 +31,12 @@ const AccountMenu = () => {
 
 export const AppBar = () => (
   <RAAppBar
-    color="primary"
     userMenu={<AccountMenu />}
     toolbar={<ToggleThemeButton />}
     sx={{ "& .RaAppBar-toolbar": { gap: 1 } }}
   >
-    <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", mr: 1 }}>
-      <Logo size={28} />
+    <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", mr: 2 }}>
+      <Logo size={30} />
     </Box>
     <TitlePortal />
   </RAAppBar>

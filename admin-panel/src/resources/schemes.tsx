@@ -15,6 +15,7 @@ import {
   TextInput,
   Toolbar,
   DeleteWithConfirmButton,
+  FunctionField,
 } from "react-admin";
 import { BulkActions, EmptyState, ListActions, NoResults, RowDelete, minLength, required, stateChoices, url } from "./shared";
 import { useCan } from "../permissions";
@@ -43,6 +44,7 @@ export const SchemeList = () => {
       >
         <TextField source="name" />
         <TextField source="state" sortable />
+        <FunctionField label="Description" source="description" sortable={false} render={(r: { description?: string }) => ((r.description ?? "").length > 90 ? `${r.description?.slice(0, 90)}...` : r.description)} />
         <TextField source="eligibility" />
         <TextField source="benefits" />
         <SafeUrlField source="applyLink" label="Apply link" />
@@ -74,7 +76,7 @@ const EditToolbar = () => (
 
 export const SchemeCreate = () => (
   <Create redirect="list">
-    <SimpleForm sx={{ maxWidth: 720 }}>
+    <SimpleForm sx={{ maxWidth: 960 }}>
       <Fields />
     </SimpleForm>
   </Create>
@@ -82,7 +84,7 @@ export const SchemeCreate = () => (
 
 export const SchemeEdit = () => (
   <Edit mutationMode="pessimistic" redirect="list">
-    <SimpleForm sx={{ maxWidth: 720 }} toolbar={<EditToolbar />}>
+    <SimpleForm sx={{ maxWidth: 960 }} toolbar={<EditToolbar />}>
       <Fields />
     </SimpleForm>
   </Edit>

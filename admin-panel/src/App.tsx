@@ -31,7 +31,7 @@ const Profile = lazy(() => import("./pages/Profile"));
  */
 const App = () => (
   <Admin
-    title="AgroSence Admin"
+    title="AgroSense Admin"
     dataProvider={dataProvider}
     authProvider={authProvider}
     dashboard={Dashboard}

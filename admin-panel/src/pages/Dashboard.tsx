@@ -19,8 +19,11 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -35,7 +38,7 @@ import ResourceIcon from "@mui/icons-material/Inventory2Outlined";
 import type { ReactNode } from "react";
 import type { AgroDataProvider } from "../dataProvider";
 import type { Stats } from "../api/types";
-import { chartColors } from "../theme";
+import { chartPalette } from "../theme";
 import { fmtDate, fmtMoney, personName } from "../format";
 
 type Row = Record<string, unknown> & { id: string };
@@ -46,14 +49,14 @@ interface DashData {
   orders: Row[];
 }
 
-const statusColor = (status: string, i: number) => {
+const statusColor = (status: string, i: number, colors: string[], neutral: string) => {
   const map: Record<string, string> = {
-    Pending: chartColors[1],
-    Accepted: chartColors[0],
-    Rejected: chartColors[3],
-    Cancelled: "#8a8f8a",
+    Pending: colors[1],
+    Accepted: colors[0],
+    Rejected: colors[3],
+    Cancelled: neutral,
   };
-  return map[status] ?? chartColors[i % chartColors.length];
+  return map[status] ?? colors[i % colors.length];
 };
 
 const Kpi = ({ label, value, icon, to }: { label: string; value: ReactNode; icon: ReactNode; to?: string }) => (
@@ -123,25 +126,34 @@ const Dashboard = () => {
     void load();
   }, [load]);
 
+  const colors = chartPalette(theme.palette.mode);
   const axis = theme.palette.text.secondary;
   const grid = theme.palette.divider;
   const tooltipStyle = {
     background: theme.palette.background.paper,
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 8,
+    borderRadius: 10,
     color: theme.palette.text.primary,
   };
 
   const s = data?.stats;
+  const overview = s
+    ? [
+        { name: "Users", value: s.users },
+        { name: "Contacts", value: s.contacts },
+        { name: "Schemes", value: s.schemes },
+        { name: "Resources", value: s.resources },
+      ]
+    : [];
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+    <Box sx={{ p: { xs: 2, sm: 3 }, width: "100%", minWidth: 0 }}>
       <Title title="Dashboard" />
-      <Typography variant="h5" sx={{ mb: 0.5 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 0.5 }}>
         Welcome back{me?.fullName ? `, ${String(me.fullName).split(" ")[0]}` : ""}
       </Typography>
       <Typography color="text.secondary" sx={{ mb: 3 }}>
-        Here is how AgroSence is doing today.
+        Here is how AgroSense is doing today.
       </Typography>
 
       {error && (
@@ -197,7 +209,7 @@ const Dashboard = () => {
                   type="monotone"
                   dataKey="count"
                   name="Signups"
-                  stroke={theme.palette.primary.main}
+                  stroke={colors[0]}
                   strokeWidth={2.5}
                   dot={false}
                   activeDot={{ r: 5 }}
@@ -221,7 +233,37 @@ const Dashboard = () => {
         </Panel>
       </Box>
 
-      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr 1fr" } }}>
+      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, mb: 2 }}>
+        <Panel title="Platform overview">
+          {!s ? (
+            <Skeleton variant="rounded" height={300} />
+          ) : overview.every((o) => o.value === 0) ? (
+            <Empty text="Nothing to chart yet." />
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={overview.filter((o) => o.value > 0)}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius="55%"
+                  outerRadius="85%"
+                  paddingAngle={2}
+                  stroke={theme.palette.background.paper}
+                  strokeWidth={2}
+                  label={({ name, percent }: { name?: string; percent?: number }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                  labelLine={false}
+                >
+                  {overview.filter((o) => o.value > 0).map((o) => (
+                    <Cell key={o.name} fill={[colors[0], colors[1], colors[2], colors[4]][overview.findIndex((x) => x.name === o.name)]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} />
+                <Legend wrapperStyle={{ color: axis, fontSize: 13 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </Panel>
         <Panel title="Orders by status">
           {!s ? (
             <Skeleton variant="rounded" height={220} />
@@ -236,7 +278,7 @@ const Dashboard = () => {
                 <Tooltip contentStyle={tooltipStyle} cursor={{ fill: theme.palette.action.hover }} />
                 <Bar dataKey="count" name="Orders" radius={[6, 6, 0, 0]}>
                   {s.ordersByStatus.map((o, i) => (
-                    <Cell key={o.status} fill={statusColor(o.status, i)} />
+                    <Cell key={o.status} fill={statusColor(o.status, i, colors, theme.palette.text.disabled)} />
                   ))}
                 </Bar>
               </BarChart>
@@ -244,6 +286,9 @@ const Dashboard = () => {
           )}
         </Panel>
 
+      </Box>
+
+      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
         <Panel
           title="Recent contacts"
           action={

@@ -1,18 +1,31 @@
 import { Box } from "@mui/material";
+import logo from "../assets/logo-96.webp";
 
-export const Logo = ({ size = 32 }: { size?: number }) => (
-  <Box
-    component="svg"
-    viewBox="0 0 32 32"
-    width={size}
-    height={size}
-    role="img"
-    aria-label="AgroSence"
-    sx={{ flexShrink: 0 }}
-  >
-    <rect width="32" height="32" rx="9" fill="#2f6b3a" />
-    <path d="M16 25V13" stroke="#f6f3ea" strokeWidth="2" strokeLinecap="round" />
-    <path d="M16 15c0-4 2.5-6.5 7-6.5 0 4-2.5 6.5-7 6.5Z" fill="#e0a548" />
-    <path d="M16 19c0-3.2-2-5.2-6-5.2 0 3.2 2 5.2 6 5.2Z" fill="#f6f3ea" />
+/** Same mark + wordmark as the website (Brand.jsx): "Agro" in ink, "Sense" in primary green. */
+export const Logo = ({ size = 32, light = false, showText = true }: { size?: number; light?: boolean; showText?: boolean }) => (
+  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1, flexShrink: 0 }} aria-label="AgroSense">
+    <Box
+      component="img"
+      src={logo}
+      alt=""
+      width={size}
+      height={size}
+      sx={{ width: size, height: size, borderRadius: "10px", display: "block" }}
+    />
+    {showText && (
+      <Box
+        component="span"
+        sx={{
+          fontWeight: 700,
+          fontSize: size * 0.6,
+          letterSpacing: "-0.02em",
+          lineHeight: 1,
+          color: light ? "#ffffff" : "text.primary",
+          "& b": { color: light ? "#d99a0b" : "primary.main", fontWeight: 700 },
+        }}
+      >
+        Agro<b>Sense</b>
+      </Box>
+    )}
   </Box>
 );

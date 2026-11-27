@@ -94,6 +94,7 @@ export const UserList = () => {
         <EmailField source="email" />
         <TextField source="mobile" />
         <TextField source="state" />
+        <TextField source="language" />
         <FunctionField label="Role" source="role" render={(r: ApiUser) => <RoleChip record={r} />} />
         <FunctionField label="Status" sortable={false} render={(r: ApiUser) => <StatusChip record={r} />} />
         <DateField source="createdAt" label="Joined" />
